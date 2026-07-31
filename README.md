@@ -182,14 +182,20 @@ Rules for you to follow while doing this:
 | Keybinding | Function / Action |
 |---|---|
 | `SUPER` + `SPACE` | Open Wofi Application Launcher (Top-Left under Waybar, 0px gap) |
-| `SUPER` + `RETURN` | Open Kitty Terminal |
+| `SUPER` + `RETURN` / `SUPER` + `Q` | Open Kitty Terminal |
+| `SUPER` + `E` | Open Thunar File Manager |
+| `SUPER` + `SHIFT` + `B` | Open Firefox Web Browser |
 | `SUPER` + `C` | Close Active Window |
+| `SUPER` + `M` | Exit / Logout Hyprland Session |
 | `SUPER` + `V` | Toggle Window Floating State |
+| `SUPER` + `P` | Toggle Dwindle Pseudo-Tiling Mode |
+| `SUPER` + `J` | Toggle Dwindle Split Direction (Horizontal / Vertical) |
+| `SUPER` + `F` | Toggle Fullscreen Mode |
+| `SUPER` + `SHIFT` + `F` | Toggle Maximized Window Mode |
 | `SUPER` + `S` | Toggle Dropdown Scratchpad Terminal (Floating Kitty) |
 | `SUPER` + `ALT` + `V` | Open Clipboard History Picker (Browse & paste past text/code/screenshots) |
 | `ALT` + `TAB` | Switch to Next Workspace (`e+1`) |
 | `ALT` + `SHIFT` + `TAB` | Switch to Previous Workspace (`e-1`) |
-| `SUPER` + `SHIFT` + `B` | Open Firefox Web Browser |
 | `SUPER` + `SHIFT` + `P` | Pin / Unpin Floating Window across all workspaces |
 | `SUPER` + `W` | Open Interactive Wallpaper Picker |
 | `SUPER` + `H` | Open Interactive Keybinding Cheatsheet |
@@ -199,6 +205,7 @@ Rules for you to follow while doing this:
 | `SUPER` + Left Mouse Drag | Move Window anywhere on screen |
 | `SUPER` + Right Mouse Drag | Resize Window dynamically |
 | Mouse Border Drag | Drag window borders/corners directly to resize (e.g. YouTube PiP window) |
+
 
 
 
