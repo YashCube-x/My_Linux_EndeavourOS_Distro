@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+export GDK_BACKEND=x11
+export ELECTRON_OZONE_PLATFORM_HINT=x11
+exec "/home/suyash/.local/opt/antigravity-ide/antigravity-ide" --no-sandbox "$@"

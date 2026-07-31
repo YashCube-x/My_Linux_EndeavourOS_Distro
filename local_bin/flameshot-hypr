@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+mkdir -p ~/Pictures/Screenshots
+SAVEPATH="$HOME/Pictures/Screenshots/Screenshot_$(date +'%Y%m%d_%H%M%S').png"
+
+if grim -g "$(slurp)" "$SAVEPATH"; then
+    wl-copy < "$SAVEPATH" 2>/dev/null || true
+    notify-send "Screenshot Captured" "Saved to ~/Pictures/Screenshots\nCopied to clipboard" -i "$SAVEPATH" -a "Flameshot"
+    flameshot gui -p "$SAVEPATH" &
+fi

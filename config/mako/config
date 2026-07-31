@@ -27,3 +27,8 @@ default-timeout=0
 
 [mode=do-not-disturb]
 invisible=1
+
+# Left click invokes notification default action (opens app/file)
+on-button-left=invoke-default-action
+on-button-right=dismiss
+on-touch=invoke-default-action

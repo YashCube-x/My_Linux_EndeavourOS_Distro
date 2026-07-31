@@ -9,9 +9,10 @@
 
     "custom/launcher": {
         "format": "e",
-        "on-click": "wofi --show drun -I",
-        "tooltip": false
+        "on-click": "~/.config/hypr/scripts/smart_menu.sh",
+        "tooltip": "Search Applications"
     },
+
 
     "hyprland/workspaces": {
         "format": "{icon}",

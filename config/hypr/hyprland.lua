@@ -18,6 +18,8 @@ hl.monitor({
 
 local terminal    = "kitty"
 local fileManager = "thunar"
+local browser     = "firefox --new-window"
+
 
 -------------------
 ---- AUTOSTART ----
@@ -28,7 +30,9 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("hypridle")
     hl.exec_cmd("waybar")
     hl.exec_cmd("thunar --daemon")
+    hl.exec_cmd("udiskie &")
     hl.exec_cmd("mako")
+
     hl.exec_cmd("~/.config/hypr/scripts/battery_warning.sh")
     hl.exec_cmd("systemctl --user start hyprpolkitagent")
     hl.exec_cmd("wl-paste --type text --watch cliphist store")
@@ -63,9 +67,10 @@ hl.config({
             inactive_border = "rgba(585b70aa)",
         },
 
-        resize_on_border           = false,
+        resize_on_border           = true,
         extend_border_grab_area    = 15,
         hover_icon_on_border       = true,
+
         allow_tearing              = false,
 
         layout = "dwindle",
@@ -166,8 +171,9 @@ hl.config({
         sensitivity  = 0,
 
         touchpad = {
-            natural_scroll = false,
+            natural_scroll = true,
         },
+
     },
 })
 
@@ -189,9 +195,16 @@ hl.bind(mainMod .. " + Q",      hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + C",      hl.dsp.window.close())
 hl.bind(mainMod .. " + M",      hl.dsp.exit())
 hl.bind(mainMod .. " + E",      hl.dsp.exec_cmd(fileManager))
-hl.bind(mainMod .. " + R",      hl.dsp.exec_cmd("~/.config/hypr/scripts/smart_menu.sh"))
-hl.bind(mainMod .. " + D",      hl.dsp.exec_cmd("~/.config/hypr/scripts/smart_menu.sh"))
-hl.bind(mainMod .. " + L",      hl.dsp.exec_cmd("hyprlock"))
+hl.bind(mainMod .. " + space",  hl.dsp.exec_cmd("~/.config/hypr/scripts/smart_menu.sh"))
+
+hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd(browser))
+
+
+
+
+
+
+
 
 -- Window state
 hl.bind(mainMod .. " + V",         hl.dsp.window.float({ action = "toggle" }))
@@ -224,9 +237,14 @@ hl.bind(mainMod .. " + CTRL + right", hl.dsp.window.swap({ direction = "right" }
 hl.bind(mainMod .. " + CTRL + up",    hl.dsp.window.swap({ direction = "up" }))
 hl.bind(mainMod .. " + CTRL + down",  hl.dsp.window.swap({ direction = "down" }))
 
--- Cycle focus through all windows without needing a direction
+-- Switch between workspaces with Alt + Tab
+hl.bind("ALT + Tab",         hl.dsp.focus({ workspace = "e+1" }))
+hl.bind("ALT + SHIFT + Tab", hl.dsp.focus({ workspace = "e-1" }))
 hl.bind(mainMod .. " + Tab",         hl.dsp.window.cycle_next({ next = true }))
 hl.bind(mainMod .. " + SHIFT + Tab", hl.dsp.window.cycle_next({ next = false }))
+
+
+
 
 -- Group windows into a tabbed stack, cycle the active tab
 hl.bind(mainMod .. " + G",           hl.dsp.group.toggle())
@@ -237,7 +255,9 @@ hl.bind(mainMod .. " + bracketleft",  hl.dsp.group.prev())
 hl.bind(mainMod .. " + SHIFT + P", hl.dsp.window.pin({ action = "toggle" }))
 
 -- Browse and paste clipboard history
-hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd("~/.config/waybar/scripts/clipboard_picker.sh"))
+hl.bind(mainMod .. " + ALT + V", hl.dsp.exec_cmd("~/.config/waybar/scripts/clipboard_picker.sh"))
+
+
 
 -- Pick a wallpaper
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("~/.config/hypr/scripts/wallpaper_picker.sh"))
@@ -257,8 +277,9 @@ for i = 1, 10 do
 end
 
 -- Special workspace (scratchpad)
-hl.bind(mainMod .. " + S",         hl.dsp.workspace.toggle_special("magic"))
+hl.bind(mainMod .. " + S",         hl.dsp.exec_cmd("~/.config/hypr/scripts/toggle_scratchpad.sh"))
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic" }))
+
 
 -- Scroll through existing workspaces with mainMod + scroll
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
@@ -280,12 +301,23 @@ hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd(
 -- Toggle between waybar (default) and quickshell (effects on, native OSD/menus)
 hl.bind(mainMod .. " + SHIFT + Q", hl.dsp.exec_cmd("~/.config/quickshell/toggle_bar.sh"))
 
+-- Hide/show waybar entirely
+hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("~/.config/hypr/scripts/toggle_waybar.sh"))
+
 -- Power menu (quickshell's native menu, or wofi fallback in battery mode)
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("~/.config/hypr/scripts/smart_powermenu.sh"))
 
 -- Screenshots (grim | swappy: annotate/crop, then save or copy from the panel)
-hl.bind("Print",              hl.dsp.exec_cmd("mkdir -p ~/Pictures/Screenshots && grim - | swappy -f -"))
-hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("mkdir -p ~/Pictures/Screenshots && grim -g \"$(slurp)\" - | swappy -f -"))
+hl.bind("Print",              hl.dsp.exec_cmd("~/.local/bin/copy-screenshot.sh"))
+hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("~/.local/bin/copy-screenshot.sh"))
+
+
+
+
+
+
+
+
 
 -- Laptop multimedia keys for volume and LCD brightness (smart: quickshell OSD or wob fallback)
 hl.bind("XF86AudioRaiseVolume",  hl.dsp.exec_cmd("~/.config/hypr/scripts/smart_volume.sh up"),     { locked = true, repeating = true })
@@ -335,7 +367,45 @@ hl.window_rule({
 })
 
 hl.window_rule({
+    name  = "wofi-top-left",
+    match = { class = "^(wofi)$" },
+
+    float = true,
+    move  = { 0, 27 },
+})
+
+hl.window_rule({
+    name  = "float-imv-viewer",
+    match = { class = "^(imv)$" },
+
+    float  = true,
+    center = true,
+})
+
+hl.window_rule({
+    name  = "scratchpad-kitty",
+    match = { class = "^(scratchpad_kitty)$" },
+
+    float  = true,
+    center = true,
+})
+
+
+hl.window_rule({
+    name  = "pip-always-pinned",
+    match = { title = "^([Pp]icture[- ][Ii]n[- ][Pp]icture)$" },
+
+    float = true,
+    pin   = true,
+})
+
+
+hl.window_rule({
     -- Waybar popups (yad sliders, blueman) float and center instead of tiling
+
+
+
+
     name  = "float-waybar-popups",
     match = { class = "^(yad|blueman-manager)$" },
 

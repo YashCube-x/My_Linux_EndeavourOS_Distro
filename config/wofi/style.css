@@ -13,23 +13,24 @@
 
 * {
     font-family: "Arimo Nerd Font", sans-serif;
-    font-size: 15px;
+    font-size: 13px;
 }
 
 window {
-    background-color: alpha(@base, 0.92);
-    border: 2px solid @mauve;
-    border-radius: 16px;
+    background-color: alpha(@base, 0.95);
+    border: 1px solid @mauve;
+    border-radius: 0px;
 }
 
 #input {
-    margin: 12px;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 10px;
+    margin: 4px 6px;
+    padding: 2px 6px;
+    border: 1px solid @surface1;
+    border-radius: 0px;
     background-color: @surface0;
     color: @text;
     caret-color: @mauve;
+    font-size: 12px;
 }
 
 #input image {
@@ -37,7 +38,7 @@ window {
 }
 
 #inner-box {
-    margin: 0 12px 12px 12px;
+    margin: 0 6px 6px 6px;
     background-color: transparent;
 }
 
@@ -52,11 +53,12 @@ window {
 
 #text {
     color: @text;
+    font-size: 13px;
 }
 
 #entry {
-    padding: 6px 10px;
-    border-radius: 10px;
+    padding: 4px 6px;
+    border-radius: 0px;
 }
 
 #entry:selected {
@@ -68,5 +70,5 @@ window {
 }
 
 #entry image {
-    margin-right: 10px;
+    margin-right: 6px;
 }
