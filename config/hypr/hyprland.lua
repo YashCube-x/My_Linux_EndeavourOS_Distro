@@ -406,12 +406,14 @@ hl.window_rule({
 
 
 
+hl.window_rule({
     name  = "float-waybar-popups",
-    match = { class = "^(yad|blueman-manager)$" },
+    match = { class = "^(yad|blueman-manager|pavucontrol|org.pulseaudio.pavucontrol)$" },
 
     float  = true,
     center = true,
 })
+
 
 hl.window_rule({
     -- Fix some dragging issues with XWayland
