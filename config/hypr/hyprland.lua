@@ -401,18 +401,14 @@ hl.window_rule({
 
 
 hl.window_rule({
-    -- Waybar popups (yad sliders, blueman) float and center instead of tiling
-
-
-
-
-hl.window_rule({
+    -- Waybar popups (yad sliders, blueman, pavucontrol) float and center instead of tiling
     name  = "float-waybar-popups",
     match = { class = "^(yad|blueman-manager|pavucontrol|org.pulseaudio.pavucontrol)$" },
 
     float  = true,
     center = true,
 })
+
 
 
 hl.window_rule({
