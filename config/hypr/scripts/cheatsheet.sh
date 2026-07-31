@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generates a keybind cheat-sheet from hyprland.lua and shows it via wofi with full descriptions.
+"""Generates a keybind cheat-sheet from hyprland.lua and shows it via wofi with exact app names.
 """
 import re
 import subprocess
@@ -21,8 +21,64 @@ def format_key(expr):
     expr = expr.replace('mainMod .. " + ', "SUPER + ").replace('"', "")
     return expr
 
-def get_desc(action, last_comment):
+def get_desc(key, action, last_comment):
+    k = key.strip().upper()
     act = action.lower()
+    
+    if k in ("SUPER + RETURN", "SUPER + Q"):
+        return "Open Kitty Terminal"
+    if k == "SUPER + C":
+        return "Close Active Window"
+    if k == "SUPER + M":
+        return "Exit / Logout Hyprland Session"
+    if k == "SUPER + E":
+        return "Open Thunar File Manager"
+    if k == "SUPER + SPACE":
+        return "Open Wofi Application Launcher"
+    if k == "SUPER + SHIFT + B":
+        return "Open Firefox Web Browser"
+    if k == "SUPER + V":
+        return "Toggle Window Floating State"
+    if k == "SUPER + P":
+        return "Toggle Dwindle Pseudo-Tiling"
+    if k == "SUPER + J":
+        return "Toggle Dwindle Split Direction"
+    if k == "SUPER + F":
+        return "Toggle Fullscreen Mode"
+    if k == "SUPER + SHIFT + F":
+        return "Toggle Maximized Window Mode"
+    if k == "SUPER + S":
+        return "Toggle Dropdown Scratchpad Terminal"
+    if k == "SUPER + ALT + V":
+        return "Open Clipboard History Picker"
+    if k == "ALT + TAB":
+        return "Switch to Next Workspace"
+    if k == "ALT + SHIFT + TAB":
+        return "Switch to Previous Workspace"
+    if k == "SUPER + TAB":
+        return "Cycle Window Focus Next"
+    if k == "SUPER + SHIFT + TAB":
+        return "Cycle Window Focus Previous"
+    if k == "SUPER + G":
+        return "Toggle Tabbed Window Group"
+    if k == "SUPER + SHIFT + P":
+        return "Pin/Unpin Window on All Workspaces"
+    if k == "SUPER + W":
+        return "Open Wallpaper Picker"
+    if k == "SUPER + H":
+        return "Open Keybinding Cheatsheet"
+    if k == "SUPER + ESCAPE":
+        return "Open Power &amp; Logout Menu"
+    if "PRINT" in k:
+        return "Capture Screenshot (Auto-copy)"
+    if "LEFT" in k or "RIGHT" in k or "UP" in k or "DOWN" in k:
+        if "ALT" in k:
+            return "Resize Window Bounds"
+        if "CTRL" in k:
+            return "Swap Window Position"
+        if "SHIFT" in k:
+            return "Move Window Position"
+        return "Move Window Focus"
     if "copy-screenshot" in act or "grim" in act:
         return "Capture Screenshot (Auto-copy)"
     if "smart_menu" in act:
@@ -35,15 +91,16 @@ def get_desc(action, last_comment):
         return "Open Visual Window Switcher"
     if "smart_powermenu" in act:
         return "Open Power &amp; Logout Menu"
-
     if "wallpaper_picker" in act:
         return "Open Wallpaper Picker"
     if "cheatsheet" in act:
         return "Open Keybinding Cheatsheet"
-    if "firefox" in act:
+    if "firefox" in act or "browser" in act:
         return "Open Firefox Web Browser"
-    if "exec_cmd" in act and "kitty" in act:
+    if "terminal" in act or "kitty" in act:
         return "Open Kitty Terminal"
+    if "filemanager" in act or "thunar" in act:
+        return "Open Thunar File Manager"
     if "window.close" in act:
         return "Close Active Window"
     if "window.float" in act:
@@ -58,17 +115,9 @@ def get_desc(action, last_comment):
         return "Switch to Workspace"
     if "window.move" in act and "workspace" in act:
         return "Move Window to Workspace"
-    if "focus" in act and "direction" in act:
-        return "Move Focus (Arrow Direction)"
-    if "window.swap" in act:
-        return "Swap Window Position"
-    if "fullscreen" in act:
-        return "Toggle Fullscreen Mode"
-    if "group.toggle" in act:
-        return "Toggle Tabbed Window Group"
-    if last_comment:
+    if last_comment and last_comment.lower() != "core apps":
         return last_comment
-    return ""
+    return "App / Action"
 
 divider_re = re.compile(r'^-+$')
 
@@ -103,7 +152,7 @@ def main():
             key_expr = bm.group(1)
             action_expr = bm.group(2)
             key = format_key(key_expr)
-            desc = get_desc(action_expr, last_comment)
+            desc = get_desc(key, action_expr, last_comment)
             
             if key in ("SUPER + [0-9]", "SUPER + SHIFT + [0-9]"):
                 if key in seen_loop_keys:
@@ -119,7 +168,7 @@ def main():
 
     text = "\n".join(l for l in out if l.strip())
     subprocess.run(
-        ["wofi", "--dmenu", "--prompt", "Keybinds", "-I", "--width", "680", "--height", "700",
+        ["wofi", "--dmenu", "--prompt", "Keybinds", "-I", "--width", "700", "--height", "700",
          "--allow-markup"],
         input=text,
         text=True,
