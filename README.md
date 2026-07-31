@@ -154,7 +154,25 @@ Rules for you to follow while doing this:
 | `config/starship.toml` | Shell prompt |
 | `config/mimeapps.list` | `mpv` for video, `imv` for images |
 | `zshrc` | `.zshrc` |
+| `bashrc` | `.bashrc` |
+| `local_bin/` | Utility CLI binaries (`copy-screenshot.sh`, `setup_zram.sh`, `antigravity-ide`, `flameshot-hypr`) |
 | `install.sh` | Installs every package below and symlinks everything into place |
+
+---
+
+## ⚡ Recent Desktop Enhancements & Features
+
+- **Wofi Top-Left Zero-Gap Application Menu**: Positioned at top-left attached directly under Waybar (`move = {0, 27}`), with sharp 90-degree corners, thin 1px border, and compact dimensions (`250x300`). Triggered via **`SUPER+SPACE`** or Waybar **"e"** logo.
+- **YouTube Picture-in-Picture**: Pinned across ALL workspaces (`pin = true`, `float = true`) with interactive mouse border drag resizing (`resize_on_border = true`).
+- **Dropdown Scratchpad Terminal**: Instant floating Kitty terminal toggle using **`SUPER+S`**.
+- **Workspace Switcher**: Fast workspace navigation using **`ALT+TAB`** (next workspace `e+1`) and **`ALT+SHIFT+TAB`** (previous workspace `e-1`).
+- **Auto-Copy Screenshots & Click-to-Open Notifications**: **`Print`** / **`SUPER+Print`** automatically captures region, saves to `~/Pictures/Screenshots/`, and copies `image/png` to clipboard for instant **`CTRL+V`** pasting. Left-clicking the Mako notification popup opens the image in `imv`.
+- **Clipboard History Picker**: Browse and paste past text/image snippets via **`SUPER+ALT+V`**.
+- **Interactive Terminal History Search**: Fuzzy search command history using **`CTRL+R`** in Zsh via `fzf`.
+- **zRAM Memory Compression**: Active 3.7GB `zstd` compressed RAM swap (`/dev/zram0` at Priority 100) allowing 8GB RAM systems to perform smoothly like 12GB.
+- **Sleep & Suspend Stabilization**: Eliminated DPMS signal drops and crashed lockscreen screens (`hypridle`/`hyprlock`) with clean PAM handle refresh on wake-up.
+- **Antigravity IDE & Shell Aliases**: SimpleDialog enabled for 100% click responsiveness; added `ide` & `agy-ide` terminal commands.
+
 
 Because configs are **symlinked** by `install.sh`, editing a file under
 `~/.config/...` afterward is the same as editing it in
