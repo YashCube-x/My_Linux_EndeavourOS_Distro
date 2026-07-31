@@ -79,12 +79,14 @@ Once you're booted in and logged into a terminal, with internet working:
 git clone https://github.com/YashCube-x/My_Linux_EndourOS_Distro.git ~/dotfiles
 ```
 
-### Step 3 — Run the installer
+### Step 3 — Run the Interactive Setup Wizard
 
 ```bash
 cd ~/dotfiles
-./install.sh
+./setup.sh
 ```
+
+*(This opens an interactive GUI menu where you can toggle which features to install, auto-detects your RAM/GPU hardware, and configures everything automatically!)*
 
 This installs every package the setup needs (via `pacman` and `yay`),
 symlinks all the configs into `~/.config/`, enables the required system
