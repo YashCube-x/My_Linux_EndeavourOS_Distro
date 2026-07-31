@@ -175,6 +175,32 @@ Rules for you to follow while doing this:
 - **Sleep & Suspend Stabilization**: Eliminated DPMS signal drops and crashed lockscreen screens (`hypridle`/`hyprlock`) with clean PAM handle refresh on wake-up.
 - **Antigravity IDE & Shell Aliases**: SimpleDialog enabled for 100% click responsiveness; added `ide` & `agy-ide` terminal commands.
 
+---
+
+## ⌨️ Keybindings Reference
+
+| Keybinding | Function / Action |
+|---|---|
+| `SUPER` + `SPACE` | Open Wofi Application Launcher (Top-Left under Waybar, 0px gap) |
+| `SUPER` + `RETURN` | Open Kitty Terminal |
+| `SUPER` + `C` | Close Active Window |
+| `SUPER` + `V` | Toggle Window Floating State |
+| `SUPER` + `S` | Toggle Dropdown Scratchpad Terminal (Floating Kitty) |
+| `SUPER` + `ALT` + `V` | Open Clipboard History Picker (Browse & paste past text/code/screenshots) |
+| `ALT` + `TAB` | Switch to Next Workspace (`e+1`) |
+| `ALT` + `SHIFT` + `TAB` | Switch to Previous Workspace (`e-1`) |
+| `SUPER` + `SHIFT` + `B` | Open Firefox Web Browser |
+| `SUPER` + `SHIFT` + `P` | Pin / Unpin Floating Window across all workspaces |
+| `SUPER` + `W` | Open Interactive Wallpaper Picker |
+| `SUPER` + `H` | Open Interactive Keybinding Cheatsheet |
+| `SUPER` + `ESCAPE` | Open Power & Logout Menu (Lock, Suspend, Logout, Reboot, Shutdown) |
+| `PRINT` / `SUPER` + `PRINT` | Capture Screenshot → Auto-copy to clipboard + Click notification to open in `imv` |
+| `CTRL` + `R` (in Zsh Terminal) | Interactive Fuzzy Command History Search (`fzf`) |
+| `SUPER` + Left Mouse Drag | Move Window anywhere on screen |
+| `SUPER` + Right Mouse Drag | Resize Window dynamically |
+| Mouse Border Drag | Drag window borders/corners directly to resize (e.g. YouTube PiP window) |
+
+
 
 Because configs are **symlinked** by `install.sh`, editing a file under
 `~/.config/...` afterward is the same as editing it in
