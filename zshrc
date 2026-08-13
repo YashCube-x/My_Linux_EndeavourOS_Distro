@@ -30,5 +30,9 @@ eval "$(zoxide init zsh 2>/dev/null)" || true
 
 
 
+# Set UTF-8 locale and btop alias
+export LC_ALL=en_IN.UTF-8
+alias btop="btop --force-utf"
+
 # Added by Antigravity CLI installer
 export PATH="/home/suyash/.local/bin:$PATH"
