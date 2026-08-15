@@ -76,7 +76,7 @@ cd yay && makepkg -si
 Once you're booted in and logged into a terminal, with internet working:
 
 ```bash
-git clone https://github.com/YashCube-x/My_Linux_EndourOS_Distro.git ~/dotfiles
+git clone https://github.com/YashCube-x/My_Linux_EndeavourOS_Distro.git ~/dotfiles
 ```
 
 ### Step 3 — Run the Interactive Setup Wizard
@@ -113,7 +113,7 @@ cleanly, etc.) instead of just failing silently.
 **Then paste this prompt:**
 
 ```
-Clone https://github.com/YashCube-x/My_Linux_EndourOS_Distro.git into
+Clone https://github.com/YashCube-x/My_Linux_EndeavourOS_Distro.git into
 ~/dotfiles (skip if it's already there), read its README.md for context,
 then run ./install.sh to set up this Hyprland desktop environment.
 
