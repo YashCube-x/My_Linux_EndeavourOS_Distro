@@ -54,14 +54,15 @@ fi
 # ==============================================================================
 
 CHOICES=$(whiptail --title "EndeavourOS / Hyprland Desktop Setup Wizard" \
-  --checklist "Select features to install/configure (Use Spacebar to toggle, Enter to proceed):" 20 78 8 \
+  --checklist "Select features to install/configure (Use Spacebar to toggle, Enter to proceed):" 22 78 9 \
   "HYPRLAND_CONFIG" "Hyprland, Waybar, Wofi (Top-Left 0px, PiP rules)" ON \
   "SCRATCHPAD_TERM" "Dropdown Scratchpad Terminal (Super + S)" ON \
   "SCREENSHOT_SYS"  "Auto-Copy Screenshots & Click-to-Open Popup" ON \
   "WORKSPACE_SW"    "Workspace Switcher (Alt + Tab / Alt + Shift + Tab)" ON \
   "ZRAM_OPTIMIZE"   "zRAM Memory Compression (${ZRAM_SIZE_GB}GB zstd Swap)" ON \
   "CLI_SHELL"       "Zsh Productivity Aliases (ide, update, fzf Ctrl+R)" ON \
-  "SLEEP_STABILITY" "Hypridle & Hyprlock Stabilization (No sleep crash)" ON 3>&1 1>&2 2>&3)
+  "SLEEP_STABILITY" "Hypridle & Hyprlock Stabilization (No sleep crash)" ON \
+  "GDRIVE_BACKUP"   "Google Drive Auto-Backup Isolated Folder Watcher" ON 3>&1 1>&2 2>&3)
 
 if [ $? -ne 0 ]; then
     echo "Setup cancelled by user."
@@ -80,12 +81,13 @@ mkdir -p "$CONFIG_DIR" "$HOME/.local/bin"
 # ------------------------------------------------------------------------------
 if [[ "$CHOICES" == *"HYPRLAND_CONFIG"* ]]; then
     echo -e "${GREEN}[+] Configuring Hyprland, Waybar & Wofi...${NC}"
-    mkdir -p "$CONFIG_DIR/hypr" "$CONFIG_DIR/waybar" "$CONFIG_DIR/wofi" "$CONFIG_DIR/mako"
+    mkdir -p "$CONFIG_DIR/hypr" "$CONFIG_DIR/waybar" "$CONFIG_DIR/wofi" "$CONFIG_DIR/mako" "$CONFIG_DIR/kitty"
     
     cp -rf "$DOTFILES_DIR/config/hypr/"* "$CONFIG_DIR/hypr/" 2>/dev/null || true
     cp -rf "$DOTFILES_DIR/config/waybar/"* "$CONFIG_DIR/waybar/" 2>/dev/null || true
     cp -rf "$DOTFILES_DIR/config/wofi/"* "$CONFIG_DIR/wofi/" 2>/dev/null || true
     cp -rf "$DOTFILES_DIR/config/mako/"* "$CONFIG_DIR/mako/" 2>/dev/null || true
+    [ -d "$DOTFILES_DIR/config/kitty" ] && cp -rf "$DOTFILES_DIR/config/kitty/"* "$CONFIG_DIR/kitty/" 2>/dev/null || true
 fi
 
 # ------------------------------------------------------------------------------
@@ -113,7 +115,7 @@ fi
 if [[ "$CHOICES" == *"ZRAM_OPTIMIZE"* ]]; then
     echo -e "${GREEN}[+] Configuring zRAM ${ZRAM_SIZE_GB}GB Memory Compression...${NC}"
     if command -v pacman &>/dev/null; then
-        sudo pacman -S --noconfirm zram-generator 2>/dev/null || true
+        sudo pacman -S --noconfirm --needed zram-generator 2>/dev/null || true
         sudo sh -c "printf '[zram0]\nzram-size = ram / 2\ncompression-algorithm = zstd\n' > /etc/systemd/zram-generator.conf" 2>/dev/null || true
         sudo systemctl daemon-reload 2>/dev/null || true
         sudo systemctl restart systemd-zram-setup@zram0 2>/dev/null || true
@@ -127,8 +129,8 @@ if [[ "$CHOICES" == *"CLI_SHELL"* ]]; then
     echo -e "${GREEN}[+] Configuring Zsh Aliases & fzf History Search...${NC}"
     [ -f "$DOTFILES_DIR/zshrc" ] && cp -f "$DOTFILES_DIR/zshrc" "$HOME/.zshrc" || true
     [ -f "$DOTFILES_DIR/bashrc" ] && cp -f "$DOTFILES_DIR/bashrc" "$HOME/.bashrc" || true
-    cp -f "$DOTFILES_DIR/local_bin/antigravity-ide" "$HOME/.local/bin/" 2>/dev/null || true
-    chmod +x "$HOME/.local/bin/antigravity-ide" 2>/dev/null || true
+    [ -f "$DOTFILES_DIR/local_bin/antigravity-ide" ] && cp -f "$DOTFILES_DIR/local_bin/antigravity-ide" "$HOME/.local/bin/" 2>/dev/null || true
+    [ -f "$HOME/.local/bin/antigravity-ide" ] && chmod +x "$HOME/.local/bin/antigravity-ide" 2>/dev/null || true
 fi
 
 # ------------------------------------------------------------------------------
@@ -138,6 +140,40 @@ if [[ "$CHOICES" == *"SLEEP_STABILITY"* ]]; then
     echo -e "${GREEN}[+] Stabilizing Hypridle & Hyprlock Sleep System...${NC}"
     cp -f "$DOTFILES_DIR/config/hypr/hypridle.conf" "$CONFIG_DIR/hypr/" 2>/dev/null || true
     cp -f "$DOTFILES_DIR/config/hypr/hyprlock.conf" "$CONFIG_DIR/hypr/" 2>/dev/null || true
+fi
+
+# ------------------------------------------------------------------------------
+# Feature 7: Google Drive Auto-Backup Isolated Folder Watcher
+# ------------------------------------------------------------------------------
+if [[ "$CHOICES" == *"GDRIVE_BACKUP"* ]]; then
+    echo -e "${GREEN}[+] Setting up Google Drive Automated Cloud Backup System...${NC}"
+    if command -v pacman &>/dev/null; then
+        sudo pacman -S --noconfirm --needed rclone python 2>/dev/null || true
+    fi
+
+    mkdir -p "$HOME/Linux_Back_Ups" "$HOME/.local/bin" "$CONFIG_DIR/systemd/user" "$CONFIG_DIR/gtk-3.0"
+    
+    # Copy watcher script and user service
+    [ -f "$DOTFILES_DIR/local_bin/gdrive-watcher.py" ] && cp -f "$DOTFILES_DIR/local_bin/gdrive-watcher.py" "$HOME/.local/bin/"
+    chmod +x "$HOME/.local/bin/gdrive-watcher.py"
+    
+    [ -f "$DOTFILES_DIR/config/systemd/user/gdrive-watcher.service" ] && cp -f "$DOTFILES_DIR/config/systemd/user/gdrive-watcher.service" "$CONFIG_DIR/systemd/user/"
+
+    # Add Thunar Sidebar Bookmark for 1-click access
+    BOOKMARK_LINE="file://$HOME/Linux_Back_Ups Linux Back_Ups"
+    if [ -f "$CONFIG_DIR/gtk-3.0/bookmarks" ]; then
+        if ! grep -Fxq "$BOOKMARK_LINE" "$CONFIG_DIR/gtk-3.0/bookmarks"; then
+            echo "$BOOKMARK_LINE" >> "$CONFIG_DIR/gtk-3.0/bookmarks"
+        fi
+    else
+        echo "$BOOKMARK_LINE" > "$CONFIG_DIR/gtk-3.0/bookmarks"
+    fi
+
+    # Enable and start background service
+    systemctl --user daemon-reload 2>/dev/null || true
+    systemctl --user enable --now gdrive-watcher.service 2>/dev/null || true
+
+    echo -e "${YELLOW}[!] Note: If you haven't linked your Google Drive yet, run 'rclone config' and create a remote named 'gdrive'.${NC}"
 fi
 
 # Apply reloads

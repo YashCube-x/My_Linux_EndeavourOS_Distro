@@ -174,6 +174,39 @@ Rules for you to follow while doing this:
 - **zRAM Memory Compression**: Active 3.7GB `zstd` compressed RAM swap (`/dev/zram0` at Priority 100) allowing 8GB RAM systems to perform smoothly like 12GB.
 - **Sleep & Suspend Stabilization**: Eliminated DPMS signal drops and crashed lockscreen screens (`hypridle`/`hyprlock`) with clean PAM handle refresh on wake-up.
 - **Antigravity IDE & Shell Aliases**: SimpleDialog enabled for 100% click responsiveness; added `ide` & `agy-ide` terminal commands.
+- **Automated Google Drive Cloud Backup**: Smart folder watcher (`~/Linux_Back_Ups`) that automatically uploads any pasted/dropped files or folders to Google Drive (`gdrive:Linux Back_Ups`) via `rclone` in background with desktop notifications and Thunar sidebar bookmark.
+
+---
+
+## ☁️ Google Drive Automated & Isolated Backup System
+
+An automated, isolated cloud backup service designed for zero-effort backups without syncing your entire drive.
+
+### Architecture
+```text
+[ Thunar File Manager ]
+        │
+        ▼ (Paste / Drag & Drop files)
+[ Local Folder: ~/Linux_Back_Ups ]
+        │
+        ▼ (Change detected by daemon)
+[ Background Daemon: gdrive-watcher.py ]
+        │
+        ▼ (Secure OAuth upload via rclone)
+[ Google Drive: "Linux Back_Ups" ]
+        │
+        ▼
+[ Desktop Notification: "Backup Successful!" ]
+```
+
+- **Folder Location**: `~/Linux_Back_Ups` (pinned in Thunar file manager bookmarks for 1-click access).
+- **Background Daemon**: `gdrive-watcher.service` running `gdrive-watcher.py` (lightweight ~1MB RAM, 0% CPU).
+- **Smart Debounce**: Waits for large files to finish writing locally before safely triggering upload.
+- **Commands**:
+  - Check service status: `systemctl --user status gdrive-watcher.service`
+  - List cloud files: `rclone ls "gdrive:Linux Back_Ups"`
+  - Link Google Account (first time setup): `rclone config`
+
 
 ---
 

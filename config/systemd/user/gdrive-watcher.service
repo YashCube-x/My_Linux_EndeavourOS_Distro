@@ -1,0 +1,13 @@
+[Unit]
+Description=Google Drive Auto Backup Folder Watcher
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 %h/.local/bin/gdrive-watcher.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

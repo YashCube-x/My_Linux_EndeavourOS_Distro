@@ -18,7 +18,7 @@ OFFICIAL_PKGS=(
     quickshell jq socat
     yad networkmanager pavucontrol
     papirus-icon-theme
-    mpv imv
+    mpv imv rclone python
 )
 AUR_PKGS=(supergfxctl wlogout catppuccin-gtk-theme-mocha catppuccin-cursors-mocha)
 
@@ -47,9 +47,26 @@ link_config() {
     echo "  linked $name"
 }
 
-for name in hypr waybar kitty wofi mako quickshell wlogout wob nvim swappy; do
-    link_config "$name"
+for name in hypr waybar kitty wofi mako quickshell wlogout wob nvim swappy systemd; do
+    [ -d "$CONFIG_SRC/$name" ] && link_config "$name"
 done
+
+# Copy local binaries/scripts
+mkdir -p "$HOME/.local/bin" "$HOME/Linux_Back_Ups" "$HOME/.config/gtk-3.0"
+if [ -d "$DOTFILES_DIR/local_bin" ]; then
+    cp -rf "$DOTFILES_DIR/local_bin/"* "$HOME/.local/bin/"
+    chmod +x "$HOME/.local/bin/"*
+fi
+
+# Add Thunar Sidebar Bookmark for Linux_Back_Ups
+BOOKMARK_LINE="file://$HOME/Linux_Back_Ups Linux Back_Ups"
+if [ -f "$HOME/.config/gtk-3.0/bookmarks" ]; then
+    if ! grep -Fxq "$BOOKMARK_LINE" "$HOME/.config/gtk-3.0/bookmarks"; then
+        echo "$BOOKMARK_LINE" >> "$HOME/.config/gtk-3.0/bookmarks"
+    fi
+else
+    echo "$BOOKMARK_LINE" > "$HOME/.config/gtk-3.0/bookmarks"
+fi
 
 if [ -e "$HOME/.config/starship.toml" ] || [ -L "$HOME/.config/starship.toml" ]; then
     mv "$HOME/.config/starship.toml" "$BACKUP_DIR/starship.toml"
@@ -74,6 +91,9 @@ sudo systemctl enable --now bluetooth
 if pacman -Q supergfxctl >/dev/null 2>&1; then
     sudo systemctl enable --now supergfxd
 fi
+systemctl --user daemon-reload 2>/dev/null || true
+systemctl --user enable --now gdrive-watcher.service 2>/dev/null || true
+
 
 echo "==> Setting zsh as default shell (if not already)"
 if [ "$SHELL" != "$(command -v zsh)" ]; then
