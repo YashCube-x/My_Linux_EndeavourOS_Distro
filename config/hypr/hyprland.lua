@@ -394,10 +394,11 @@ hl.window_rule({
 
 hl.window_rule({
     name  = "pip-always-pinned",
-    match = { title = "^([Pp]icture[- ][Ii]n[- ][Pp]icture)$" },
+    match = { title = ".*[Pp]icture[- ][Ii]n[- ][Pp]icture.*" },
 
     float = true,
     pin   = true,
+    keep_aspect_ratio = true,
 })
 
 
