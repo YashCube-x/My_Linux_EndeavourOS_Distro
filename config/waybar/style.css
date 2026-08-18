@@ -86,6 +86,7 @@ window#waybar {
 #memory,
 #cpu,
 #disk,
+#custom-tablet,
 #custom-brightness,
 #custom-wifi,
 #custom-bluetooth,
@@ -110,6 +111,16 @@ window#waybar {
 #disk {
     background-color: @disk-bg;
     color: @disk-fg;
+}
+
+#custom-tablet.connected {
+    background-color: #a6e3a1;
+    color: #11111b;
+}
+
+#custom-tablet.disconnected {
+    background-color: #313244;
+    color: #a6adc8;
 }
 
 #custom-brightness {
