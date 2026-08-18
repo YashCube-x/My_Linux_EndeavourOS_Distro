@@ -219,11 +219,13 @@ hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
 
--- Switch between screens / monitors with 1-Key Shortcut (SUPER + S / SUPER + M)
-hl.bind(mainMod .. " + S",           hl.dsp.focus({ monitor = "+1" }))
-hl.bind(mainMod .. " + M",           hl.dsp.focus({ monitor = "+1" }))
-hl.bind(mainMod .. " + SHIFT + S",   hl.dsp.window.move({ monitor = "+1" }))
-hl.bind(mainMod .. " + SHIFT + M",   hl.dsp.window.move({ monitor = "+1" }))
+-- Switch between screens / monitors with 1-Key Shortcut (SUPER + ` / SUPER + S / SUPER + M)
+hl.bind(mainMod .. " + grave",         hl.dsp.focus({ monitor = "+1" }))
+hl.bind(mainMod .. " + SHIFT + grave", hl.dsp.window.move({ monitor = "+1" }))
+hl.bind(mainMod .. " + S",             hl.dsp.focus({ monitor = "+1" }))
+hl.bind(mainMod .. " + M",             hl.dsp.focus({ monitor = "+1" }))
+hl.bind(mainMod .. " + SHIFT + S",     hl.dsp.window.move({ monitor = "+1" }))
+hl.bind(mainMod .. " + SHIFT + M",     hl.dsp.window.move({ monitor = "+1" }))
 
 -- Move the active window within the layout with mainMod + SHIFT + arrow keys
 hl.bind(mainMod .. " + SHIFT + left",  hl.dsp.window.move({ direction = "left" }))
