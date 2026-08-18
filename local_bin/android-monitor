@@ -2,6 +2,7 @@
 # ==============================================================================
 # Android Tablet as Second Monitor for Hyprland (Wayland)
 # Optimized for Samsung Galaxy Tab A9 (Native 5:3 / 1340x800 - 2010x1200 @ 1.5x)
+# Hardware GPU Accelerated (-g) & 60 FPS unlocked (-f 60)
 # ==============================================================================
 
 ACTION="${1:-start}"
@@ -28,7 +29,7 @@ else
     echo "📍 Positioning Tablet to the LEFT of laptop screen"
 fi
 
-echo "🚀 Starting Android Second Monitor for Hyprland (Samsung Tab A9 Optimized)..."
+echo "🚀 Starting Android Second Monitor for Hyprland (GPU 60 FPS Accelerated)..."
 
 # Clean up any leftover previous wayvnc or headless displays
 pkill -9 -f wayvnc 2>/dev/null
@@ -56,8 +57,8 @@ if which adb >/dev/null 2>&1; then
     adb reverse tcp:5900 tcp:5900 2>/dev/null
 fi
 
-# 4. Start WayVNC attached specifically to the dynamic HEADLESS monitor
-WAYLAND_DISPLAY=wayland-1 XDG_RUNTIME_DIR=/run/user/1000 wayvnc -o "$HEADLESS_NAME" 0.0.0.0 5900 > /dev/null 2>&1 &
+# 4. Start WayVNC with GPU Acceleration (-g) and 60 FPS (-f 60)
+WAYLAND_DISPLAY=wayland-1 XDG_RUNTIME_DIR=/run/user/1000 wayvnc -g -f 60 -o "$HEADLESS_NAME" 0.0.0.0 5900 > /dev/null 2>&1 &
 
 sleep 1
 
@@ -65,11 +66,11 @@ sleep 1
 WIFI_IP=$(ip addr show wlan0 2>/dev/null | grep "inet " | awk '{print $2}' | cut -d/ -f1)
 USB_IP=$(ip addr show enp0s20f0u1 2>/dev/null | grep "inet " | awk '{print $2}' | cut -d/ -f1)
 
-notify-send -u critical -a "Android Monitor" "Samsung Tab A9 Monitor Ready!" "USB: localhost:5900\nWi-Fi: ${WIFI_IP:-none}:5900"
+notify-send -u critical -a "Android Monitor" "GPU 60FPS Monitor Ready!" "USB: localhost:5900\nWi-Fi: ${WIFI_IP:-none}:5900"
 
 echo ""
 echo "=================================================================="
-echo "✅ VIRTUAL MONITOR IS READY FOR SAMSUNG TAB A9!"
+echo "✅ VIRTUAL MONITOR IS READY (GPU ACCELERATED 60 FPS)!"
 echo "=================================================================="
 echo "📱 In your Android VNC App (AVNC / VNC Viewer), Connect to:"
 echo ""
