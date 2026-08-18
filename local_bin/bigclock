@@ -1,0 +1,3 @@
+#!/bin/bash
+# Launches the Ultra-Large Modern Fullscreen Clock
+firefox --kiosk "file:///home/suyash/.config/clock/index.html"

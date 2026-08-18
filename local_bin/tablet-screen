@@ -1,0 +1,51 @@
+#!/bin/bash
+# ==============================================================================
+# Tablet Second Monitor Launch Script (USB & Wi-Fi)
+# ==============================================================================
+
+echo "🚀 Starting Tablet Second Monitor Server..."
+
+# Ensure uinput permissions
+if [ ! -w /dev/uinput ]; then
+    echo "Suyash@123" | sudo -S chmod 666 /dev/uinput 2>/dev/null
+fi
+
+# Setup ADB port forwarding if USB is connected
+if which adb >/dev/null 2>&1; then
+    adb forward tcp:1701 tcp:1701 2>/dev/null
+    adb forward tcp:9001 tcp:9001 2>/dev/null
+fi
+
+# Kill previous instance if running
+pkill -9 -f weylus 2>/dev/null
+sleep 1
+
+# Launch Weylus in background with Wayland support
+env WAYLAND_DISPLAY=wayland-1 XDG_RUNTIME_DIR=/run/user/1000 weylus --auto-start --wayland-support > /dev/null 2>&1 &
+
+sleep 2
+
+# Detect USB IP
+USB_IP=$(ip addr show enp0s20f0u1 2>/dev/null | grep "inet " | awk '{print $2}' | cut -d/ -f1)
+WIFI_IP=$(ip addr show wlan0 2>/dev/null | grep "inet " | awk '{print $2}' | cut -d/ -f1)
+
+echo ""
+echo "=================================================================="
+echo "📱 OPEN ONE OF THESE LINKS ON YOUR TABLET (CHROME / BRAVE):"
+echo "=================================================================="
+echo "⚡ If using USB Cable (with USB Debugging):"
+echo "   👉 http://localhost:1701"
+echo ""
+if [ -n "$USB_IP" ]; then
+    echo "🔌 If using USB Tethering:"
+    echo "   👉 http://$USB_IP:1701"
+    echo ""
+fi
+if [ -n "$WIFI_IP" ]; then
+    echo "📶 If using Same Wi-Fi:"
+    echo "   👉 http://$WIFI_IP:1701"
+    echo ""
+fi
+echo "=================================================================="
+echo "Tip: Press SUPER + SHIFT + Right Arrow to send windows to your tablet!"
+echo "=================================================================="
