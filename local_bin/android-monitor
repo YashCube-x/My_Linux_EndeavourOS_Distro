@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==============================================================================
 # Android Tablet as Second Monitor for Hyprland (Wayland)
-# Default: LEFT SIDE with 1.5x Tablet Scaling
+# Optimized for Samsung Galaxy Tab A9 (Native 5:3 / 1340x800 - 2010x1200 @ 1.5x)
 # ==============================================================================
 
 ACTION="${1:-start}"
@@ -16,8 +16,11 @@ if [ "$ACTION" = "stop" ]; then
     exit 0
 fi
 
-# Default Position: LEFT of laptop screen (-1280x0) with 1.5x scale
-POSITION="-1280x0"
+# Samsung Galaxy Tab A9 native 5:3 aspect ratio: 2010x1200 at 1.5x scale (1340x800 logical)
+RESOLUTION="2010x1200@60"
+SCALE="1.5"
+
+POSITION="-1340x0"
 if [ "$ACTION" = "right" ]; then
     POSITION="1920x0"
     echo "📍 Positioning Tablet to the RIGHT of laptop screen"
@@ -25,7 +28,7 @@ else
     echo "📍 Positioning Tablet to the LEFT of laptop screen"
 fi
 
-echo "🚀 Starting Android Second Monitor for Hyprland..."
+echo "🚀 Starting Android Second Monitor for Hyprland (Samsung Tab A9 Optimized)..."
 
 # Clean up any leftover previous wayvnc or headless displays
 pkill -9 -f wayvnc 2>/dev/null
@@ -44,9 +47,9 @@ if [ -z "$HEADLESS_NAME" ]; then
     exit 1
 fi
 
-# 2. Apply LEFT Position (-1280x0) and 1.5x Tablet UI Scaling
-hyprctl eval "hl.monitor({ output = \"$HEADLESS_NAME\", mode = \"1920x1080@60\", position = \"$POSITION\", scale = 1.5 })" 2>/dev/null
-echo "✅ Created Virtual Screen: $HEADLESS_NAME with 1.5x Scaling on the LEFT ($POSITION)"
+# 2. Apply Samsung Tab A9 Native Resolution (2010x1200 / 1.5x on LEFT)
+hyprctl eval "hl.monitor({ output = \"$HEADLESS_NAME\", mode = \"$RESOLUTION\", position = \"$POSITION\", scale = $SCALE })" 2>/dev/null
+echo "✅ Created Virtual Screen: $HEADLESS_NAME ($RESOLUTION, scale $SCALE at $POSITION)"
 
 # 3. Setup ADB USB reverse port forwarding if USB is connected
 if which adb >/dev/null 2>&1; then
@@ -62,11 +65,11 @@ sleep 1
 WIFI_IP=$(ip addr show wlan0 2>/dev/null | grep "inet " | awk '{print $2}' | cut -d/ -f1)
 USB_IP=$(ip addr show enp0s20f0u1 2>/dev/null | grep "inet " | awk '{print $2}' | cut -d/ -f1)
 
-notify-send -u critical -a "Android Monitor" "Virtual Monitor Ready (1.5x Left)!" "USB: localhost:5900\nWi-Fi: ${WIFI_IP:-none}:5900"
+notify-send -u critical -a "Android Monitor" "Samsung Tab A9 Monitor Ready!" "USB: localhost:5900\nWi-Fi: ${WIFI_IP:-none}:5900"
 
 echo ""
 echo "=================================================================="
-echo "✅ VIRTUAL MONITOR IS READY (1.5x SCALING ON THE LEFT)!"
+echo "✅ VIRTUAL MONITOR IS READY FOR SAMSUNG TAB A9!"
 echo "=================================================================="
 echo "📱 In your Android VNC App (AVNC / VNC Viewer), Connect to:"
 echo ""
