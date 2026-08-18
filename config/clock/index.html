@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Fullscreen Clock</title>
+    <!-- Google Fonts for Ultra-Modern Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;800;900&family=Bebas+Neue&family=Space+Grotesk:wght@700&family=JetBrains+Mono:wght@800&family=Urbanist:wght@800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        :root {
+            --bg-color: #0b0c10;
+            --text-color: #89b4fa;
+            --sec-color: #f38ba8;
+            --sub-color: #a6adc8;
+            --font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* HUGE CLOCK DISPLAY */
+        .time-wrapper {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            line-height: 0.9;
+            letter-spacing: -2px;
+        }
+
+        .digits {
+            font-size: 19vw;
+            font-weight: 900;
+            color: var(--text-color);
+            text-shadow: 0 10px 40px rgba(137, 180, 250, 0.15);
+        }
+
+        .colon {
+            font-size: 16vw;
+            font-weight: 800;
+            margin: 0 0.5vw;
+            color: var(--sub-color);
+            opacity: 0.6;
+            animation: pulse 1s infinite alternate;
+        }
+
+        .seconds-box {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-left: 1.5vw;
+        }
+
+        .seconds {
+            font-size: 8vw;
+            font-weight: 900;
+            color: var(--sec-color);
+            line-height: 1;
+            text-shadow: 0 4px 20px rgba(243, 139, 168, 0.2);
+        }
+
+        .ampm {
+            font-size: 2.2vw;
+            font-weight: 800;
+            color: var(--sub-color);
+            letter-spacing: 2px;
+            margin-top: 0.5vw;
+        }
+
+        /* DATE & DAY */
+        .date-wrapper {
+            margin-top: 2.5vh;
+            font-size: 2.4vw;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--sub-color);
+        }
+
+        .day-badge {
+            color: #cdd6f4;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-right: 12px;
+        }
+
+        /* CONTROLS HINT */
+        .controls-hint {
+            position: absolute;
+            bottom: 24px;
+            font-size: 0.9vw;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.25);
+            text-transform: uppercase;
+            font-weight: 600;
+            transition: opacity 0.5s;
+        }
+
+        body:hover .controls-hint {
+            opacity: 0.8;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.9; }
+        }
+
+        /* THEME VARIATIONS */
+        body.theme-amoled {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --sec-color: #00f2fe;
+            --sub-color: #888888;
+        }
+
+        body.theme-cyberpunk {
+            --bg-color: #0f051d;
+            --text-color: #f72585;
+            --sec-color: #4cc9f0;
+            --sub-color: #7209b7;
+        }
+
+        body.theme-gold {
+            --bg-color: #0d0d0d;
+            --text-color: #f6d365;
+            --sec-color: #fda085;
+            --sub-color: #999;
+        }
+
+        body.theme-catppuccin {
+            --bg-color: #1e1e2e;
+            --text-color: #cba6f7;
+            --sec-color: #a6e3a1;
+            --sub-color: #9399b2;
+        }
+    </style>
+</head>
+<body class="theme-catppuccin">
+    <div class="container">
+        <div class="time-wrapper">
+            <span class="digits" id="hours">00</span>
+            <span class="colon">:</span>
+            <span class="digits" id="minutes">00</span>
+            <div class="seconds-box">
+                <span class="seconds" id="seconds">00</span>
+                <span class="ampm" id="ampm">AM</span>
+            </div>
+        </div>
+        <div class="date-wrapper">
+            <span class="day-badge" id="day">MONDAY</span>
+            <span id="date">17 AUGUST 2026</span>
+        </div>
+    </div>
+
+    <div class="controls-hint">
+        Click or Press <b>[T]</b> to Change Theme • Press <b>[F]</b> for Fullscreen • <b>[Esc / Q]</b> to Exit
+    </div>
+
+    <script>
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+        const ampmEl = document.getElementById('ampm');
+        const dayEl = document.getElementById('day');
+        const dateEl = document.getElementById('date');
+
+        function updateTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+
+            // 12-hour format for aesthetic balance
+            hours = hours % 12 || 12;
+            hoursEl.textContent = String(hours).padStart(2, '0');
+            minutesEl.textContent = minutes;
+            secondsEl.textContent = seconds;
+            ampmEl.textContent = ampm;
+
+            const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+            const months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+
+            dayEl.textContent = days[now.getDay()];
+            dateEl.textContent = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Theme switching logic
+        const themes = ['theme-catppuccin', 'theme-amoled', 'theme-cyberpunk', 'theme-gold'];
+        let currentTheme = 0;
+
+        function cycleTheme() {
+            document.body.className = '';
+            currentTheme = (currentTheme + 1) % themes.length;
+            document.body.classList.add(themes[currentTheme]);
+        }
+
+        document.body.addEventListener('click', cycleTheme);
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 't') {
+                cycleTheme();
+            } else if (e.key.toLowerCase() === 'f') {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen();
+                } else {
+                    document.exitFullscreen();
+                }
+            } else if (e.key.toLowerCase() === 'q' || e.key === 'Escape') {
+                window.close();
+            }
+        });
+    </script>
+</body>
+</html>
