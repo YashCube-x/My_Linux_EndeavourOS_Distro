@@ -3,6 +3,7 @@
 # Android Tablet as Second Monitor for Hyprland (Wayland)
 # Optimized for Samsung Galaxy Tab A9 (Native 5:3 / 1340x800 - 2010x1200 @ 1.5x)
 # Hardware GPU Accelerated (-g) & 60 FPS unlocked (-f 60)
+# Auto-detects USB Tethering & Wi-Fi interfaces
 # ==============================================================================
 
 ACTION="${1:-start}"
@@ -62,11 +63,15 @@ WAYLAND_DISPLAY=wayland-1 XDG_RUNTIME_DIR=/run/user/1000 wayvnc -g -f 60 -o "$HE
 
 sleep 1
 
-# Detect IPs
-WIFI_IP=$(ip addr show wlan0 2>/dev/null | grep "inet " | awk '{print $2}' | cut -d/ -f1)
-USB_IP=$(ip addr show enp0s20f0u1 2>/dev/null | grep "inet " | awk '{print $2}' | cut -d/ -f1)
+# Detect IPs dynamically
+WIFI_IP=$(ip -4 addr show wlan0 2>/dev/null | grep "inet " | awk '{print $2}' | cut -d/ -f1)
+USB_IP=$(ip -4 addr | grep -E "enp0s20f0u|usb|rndis" | awk '{print $2}' | cut -d/ -f1 | head -n 1)
 
-notify-send -u critical -a "Android Monitor" "GPU 60FPS Monitor Ready!" "USB: localhost:5900\nWi-Fi: ${WIFI_IP:-none}:5900"
+if [ -n "$USB_IP" ]; then
+    notify-send -u critical -a "Android Monitor" "Direct USB Cable Ready!" "USB IP: $USB_IP:5900"
+else
+    notify-send -u normal -a "Android Monitor" "Wi-Fi Monitor Ready!" "Wi-Fi IP: ${WIFI_IP:-none}:5900"
+fi
 
 echo ""
 echo "=================================================================="
@@ -74,17 +79,16 @@ echo "✅ VIRTUAL MONITOR IS READY (GPU ACCELERATED 60 FPS)!"
 echo "=================================================================="
 echo "📱 In your Android VNC App (AVNC / VNC Viewer), Connect to:"
 echo ""
-echo "⚡ If using USB Cable with USB-Debugging:"
-echo "   👉 Address: localhost:5900 (or 127.0.0.1:5900)"
-echo ""
 if [ -n "$USB_IP" ]; then
-    echo "🔌 If using USB Tethering:"
-    echo "   👉 Address: $USB_IP:5900"
+    echo "🔌 Direct USB Cable (Wi-Fi OFF):"
+    echo "   👉 Host: $USB_IP"
+    echo "   👉 Port: 5900"
     echo ""
 fi
 if [ -n "$WIFI_IP" ]; then
-    echo "📶 If using Same Wi-Fi:"
-    echo "   👉 Address: $WIFI_IP:5900"
+    echo "📶 Wi-Fi Connection:"
+    echo "   👉 Host: $WIFI_IP"
+    echo "   👉 Port: 5900"
     echo ""
 fi
 echo "🔑 Password: (None / Leave empty)"
