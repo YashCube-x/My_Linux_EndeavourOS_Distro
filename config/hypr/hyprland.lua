@@ -6,6 +6,14 @@
 ------------------
 
 hl.monitor({
+    -- Samsung Galaxy Tab A9 (Second Screen on the LEFT with 1.5x scale)
+    output   = "^(HEADLESS-.*)$",
+    mode     = "2010x1200@60",
+    position = "-1340x0",
+    scale    = 1.5,
+})
+
+hl.monitor({
     output   = "",
     mode     = "preferred",
     position = "auto",
