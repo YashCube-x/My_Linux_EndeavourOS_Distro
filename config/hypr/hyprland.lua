@@ -406,9 +406,29 @@ hl.window_rule({
 
 
 hl.window_rule({
-    -- Waybar popups (yad sliders, blueman, pavucontrol) float and center instead of tiling
-    name  = "float-waybar-popups",
-    match = { class = "^(yad|blueman-manager|pavucontrol|org.pulseaudio.pavucontrol)$" },
+    -- Pavucontrol Volume Mixer (Original standard comfortable size)
+    name  = "pavucontrol-window",
+    match = { class = "^(pavucontrol|org.pulseaudio.pavucontrol)$" },
+
+    float  = true,
+    center = true,
+    size   = { 760, 530 },
+})
+
+hl.window_rule({
+    -- Bluetooth Manager
+    name  = "blueman-window",
+    match = { class = "^(blueman-manager)$" },
+
+    float  = true,
+    center = true,
+    size   = { 700, 480 },
+})
+
+hl.window_rule({
+    -- Yad popups
+    name  = "yad-popups",
+    match = { class = "^(yad)$" },
 
     float  = true,
     center = true,
