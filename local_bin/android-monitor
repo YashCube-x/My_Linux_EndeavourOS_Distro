@@ -4,6 +4,7 @@
 # Optimized for Samsung Galaxy Tab A9 (Native 5:3 / 1340x800 - 2010x1200 @ 1.5x)
 # Hardware GPU Accelerated (-g) & 60 FPS unlocked (-f 60)
 # Auto-detects USB Tethering & Wi-Fi interfaces
+# Automatically draws Wallpaper on Tablet Screen
 # ==============================================================================
 
 ACTION="${1:-start}"
@@ -53,12 +54,17 @@ fi
 hyprctl eval "hl.monitor({ output = \"$HEADLESS_NAME\", mode = \"$RESOLUTION\", position = \"$POSITION\", scale = $SCALE })" 2>/dev/null
 echo "✅ Created Virtual Screen: $HEADLESS_NAME ($RESOLUTION, scale $SCALE at $POSITION)"
 
-# 3. Setup ADB USB reverse port forwarding if USB is connected
+# 3. Reload Wallpaper so it renders on Tablet Screen immediately
+pkill -9 hyprpaper 2>/dev/null
+sleep 0.2
+WAYLAND_DISPLAY=wayland-1 XDG_RUNTIME_DIR=/run/user/1000 hyprpaper > /dev/null 2>&1 &
+
+# 4. Setup ADB USB reverse port forwarding if USB is connected
 if which adb >/dev/null 2>&1; then
     adb reverse tcp:5900 tcp:5900 2>/dev/null
 fi
 
-# 4. Start WayVNC with GPU Acceleration (-g) and 60 FPS (-f 60)
+# 5. Start WayVNC with GPU Acceleration (-g) and 60 FPS (-f 60)
 WAYLAND_DISPLAY=wayland-1 XDG_RUNTIME_DIR=/run/user/1000 wayvnc -g -f 60 -o "$HEADLESS_NAME" 0.0.0.0 5900 > /dev/null 2>&1 &
 
 sleep 1
