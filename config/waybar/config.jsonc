@@ -73,8 +73,10 @@
     "custom/brightness": {
         "exec": "brightnessctl i | grep -oP '\\(\\K[^%]+'",
         "format": " {}%",
-        "interval": 5,
+        "interval": 1,
         "on-click": "~/.config/waybar/scripts/brightness_popup.sh",
+        "on-scroll-up": "brightnessctl set 5%+",
+        "on-scroll-down": "brightnessctl set 5%-",
         "tooltip": false
     },
 
@@ -101,6 +103,8 @@
         "interval": 1,
         "on-click": "pavucontrol",
         "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "on-scroll-up": "wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+",
+        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-",
         "tooltip": false
     },
 
