@@ -87,9 +87,11 @@ window#waybar {
 #cpu,
 #disk,
 #custom-tablet,
+#backlight,
 #custom-brightness,
 #custom-wifi,
 #custom-bluetooth,
+#pulseaudio,
 #custom-volume,
 #battery,
 #clock {
@@ -123,6 +125,7 @@ window#waybar {
     color: #a6adc8;
 }
 
+#backlight,
 #custom-brightness {
     background-color: @bright-bg;
     color: @bright-fg;
@@ -144,11 +147,13 @@ window#waybar {
     color: @bt-fg;
 }
 
-#custom-bluetooth.off {
+#custom-bluetooth.off,
+#custom-bluetooth.disconnected {
     background-color: @separator;
     color: @muted;
 }
 
+#pulseaudio,
 #custom-volume {
     background-color: @vol-bg;
     color: @vol-fg;
