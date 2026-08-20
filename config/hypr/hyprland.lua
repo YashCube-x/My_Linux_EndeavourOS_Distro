@@ -5,13 +5,15 @@
 ---- MONITORS ----
 ------------------
 
-hl.monitor({
-    -- Samsung Galaxy Tab A9 (Second Screen on the LEFT with 1.5x scale)
-    output   = "^(HEADLESS-.*)$",
-    mode     = "2010x1200@60",
-    position = "-1340x0",
-    scale    = 1.5,
-})
+-- Samsung Galaxy Tab A9 (Second Screen on the LEFT with 1.5x scale)
+for i = 1, 10 do
+    hl.monitor({
+        output   = "HEADLESS-" .. i,
+        mode     = "2010x1200@60",
+        position = "-1340x0",
+        scale    = 1.5,
+    })
+end
 
 hl.monitor({
     output   = "",
