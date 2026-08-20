@@ -227,9 +227,9 @@ hl.bind("ALT + right", hl.dsp.focus({ direction = "right" }))
 hl.bind("ALT + up",    hl.dsp.focus({ direction = "up" }))
 hl.bind("ALT + down",  hl.dsp.focus({ direction = "down" }))
 
--- Switch between workspaces with SUPER + left / right arrow keys
-hl.bind(mainMod .. " + left",  hl.dsp.focus({ workspace = "e-1" }))
-hl.bind(mainMod .. " + right", hl.dsp.focus({ workspace = "e+1" }))
+-- Switch between workspaces on the active monitor with SUPER + left / right arrow keys
+hl.bind(mainMod .. " + left",  hl.dsp.focus({ workspace = "m-1" }))
+hl.bind(mainMod .. " + right", hl.dsp.focus({ workspace = "m+1" }))
 
 -- Move the active window within the layout with mainMod + SHIFT + arrow keys
 hl.bind(mainMod .. " + SHIFT + left",  hl.dsp.window.move({ direction = "left" }))
