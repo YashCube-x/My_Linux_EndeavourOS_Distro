@@ -221,11 +221,11 @@ hl.bind(mainMod .. " + J",         hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + F",         hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }))
 
--- Move focus with mainMod + arrow keys
-hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
-hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
-hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
-hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
+-- Move focus with ALT + arrow keys (SUPER + left / right are now free)
+hl.bind("ALT + left",  hl.dsp.focus({ direction = "left" }))
+hl.bind("ALT + right", hl.dsp.focus({ direction = "right" }))
+hl.bind("ALT + up",    hl.dsp.focus({ direction = "up" }))
+hl.bind("ALT + down",  hl.dsp.focus({ direction = "down" }))
 
 -- Move the active window within the layout with mainMod + SHIFT + arrow keys
 hl.bind(mainMod .. " + SHIFT + left",  hl.dsp.window.move({ direction = "left" }))
