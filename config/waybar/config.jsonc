@@ -3,7 +3,7 @@
     "layer": "top",
     "position": "top",
     "height": 30,
-    "spacing": 14,
+    "spacing": 8,
 
     "modules-left": ["custom/launcher", "hyprland/workspaces", "hyprland/window"],
     "modules-right": ["custom/system_stats", "custom/tablet", "backlight", "custom/wifi", "custom/bluetooth", "pulseaudio", "battery", "custom/notification", "clock", "custom/power"],
@@ -115,7 +115,7 @@
     },
 
     "clock": {
-        "format": "{:%a %b %d  %I:%M %p}",
+        "format": "{:%a %b %d %I:%M %p}",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
     },
 
