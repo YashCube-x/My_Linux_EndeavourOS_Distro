@@ -451,12 +451,13 @@ hl.window_rule({
 hl.window_rule({
     -- macOS iStat Menus System Widget Popup
     name  = "istat-popup-window",
-    match = { class = "^(istat_popup)$" },
+    match = { title = "^(iStat Menus)$" },
 
     float       = true,
     pin         = true,
     border_size = 0,
-    size        = { 330, 520 },
+    size        = { 330, 500 },
+    move        = { 1580, 36 },
 })
 
 
