@@ -73,9 +73,7 @@ window#waybar {
 
 /* --- Right Section (macOS Control Center Style) --- */
 
-#memory,
-#cpu,
-#disk,
+#custom-system_stats,
 #custom-tablet,
 #backlight,
 #custom-wifi,
@@ -130,9 +128,10 @@ window#waybar {
     font-size: 11px;
 }
 
-#disk {
-    color: rgba(255, 255, 255, 0.78);
-    font-size: 11px;
+#custom-system_stats {
+    color: #38bdf8;
+    font-size: 14px;
+    padding: 0 8px;
 }
 
 /* Wireless disconnected states */
