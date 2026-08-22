@@ -449,7 +449,7 @@ hl.window_rule({
 })
 
 hl.window_rule({
-    -- macOS iStat Menus System Widget Popup
+    -- macOS iStat Menus System Widget Popup (Slides down right under RAM/CPU)
     name  = "istat-popup-window",
     match = { title = "^(iStat Menus)$" },
 
@@ -457,7 +457,8 @@ hl.window_rule({
     pin         = true,
     border_size = 0,
     size        = { 330, 500 },
-    move        = { 1580, 36 },
+    move        = { 1120, 34 },
+    animation   = "slide top",
 })
 
 

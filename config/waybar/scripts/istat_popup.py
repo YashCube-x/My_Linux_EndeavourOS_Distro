@@ -7,7 +7,9 @@ import gi
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
-from gi.repository import Gtk, Gdk, GLib, cairo
+gi.require_version('Pango', '1.0')
+gi.require_version('PangoCairo', '1.0')
+from gi.repository import Gtk, Gdk, GLib, Pango, PangoCairo, cairo
 
 PID_FILE = "/tmp/istat_popup.pid"
 
@@ -70,6 +72,13 @@ def get_stats():
     cpu_count = os.cpu_count() or 4
     pressure_pct = min(100, int((load1 / cpu_count) * 100))
 
+    # Segments for Memory Gauge (App=Blue, Wired=Pink, Comp=Yellow)
+    segments = []
+    if total > 0:
+        segments.append((app_mem / total, 0.23, 0.51, 0.96))      # Blue #3b82f6
+        segments.append((wired_mem / total, 0.92, 0.28, 0.60))    # Pink #ec4899
+        segments.append((compressed_mem / total, 0.92, 0.70, 0.03)) # Yellow #eab308
+
     processes = []
     try:
         output = subprocess.check_output(
@@ -88,7 +97,7 @@ def get_stats():
                         "firefox": "Firefox Browser",
                         "Isolated Web Co": "Firefox Tab",
                         "WebExtensions": "Firefox Ext",
-                        "chrome": "Chrome",
+                        "chrome": "Google Chrome",
                         "antigravity-ide": "Antigravity IDE",
                         "language_server": "Language Server",
                         "claude": "Claude Code",
@@ -123,6 +132,7 @@ def get_stats():
     return {
         "pressure_pct": pressure_pct,
         "mem_pct": mem_pct,
+        "segments": segments,
         "app_mem": fmt_gb(app_mem),
         "wired_mem": fmt_gb(wired_mem),
         "compressed_mem": fmt_gb(compressed_mem),
@@ -134,62 +144,74 @@ def get_stats():
     }
 
 class GaugeWidget(Gtk.DrawingArea):
-    def __init__(self, title, color_hex):
+    def __init__(self, title, gauge_type):
         super().__init__()
-        self.set_size_request(100, 100)
+        self.set_size_request(105, 105)
         self.title = title
-        self.color_hex = color_hex
+        self.gauge_type = gauge_type
         self.pct = 0
+        self.segments = []
         self.connect("draw", self.on_draw)
 
-    def set_pct(self, pct):
+    def set_data(self, pct, segments=None):
         self.pct = pct
+        self.segments = segments or []
         self.queue_draw()
 
     def on_draw(self, widget, cr):
-        width = widget.get_allocated_width()
-        height = widget.get_allocated_height()
-        center_x = width / 2.0
-        center_y = height / 2.0
-        radius = min(center_x, center_y) - 8.0
-        line_width = 7.0
+        w = widget.get_allocated_width()
+        h = widget.get_allocated_height()
+        cx = w / 2.0
+        cy = h / 2.0
+        r = min(cx, cy) - 10.0
+        lw = 7.5
 
-        # Draw background track
-        cr.set_line_width(line_width)
-        cr.set_source_rgba(1.0, 1.0, 1.0, 0.08)
-        cr.arc(center_x, center_y, radius, 0, 2 * math.pi)
+        # 1. Background circle track
+        cr.set_line_width(lw)
+        cr.set_source_rgba(1.0, 1.0, 1.0, 0.09)
+        cr.arc(cx, cy, r, 0, 2 * math.pi)
         cr.stroke()
 
-        # Draw progress arc
+        # 2. Draw Progress Arc
         start_angle = -math.pi / 2.0
-        end_angle = start_angle + (self.pct / 100.0) * (2 * math.pi)
-
         cr.set_line_cap(cairo.LINE_CAP_ROUND)
-        if self.color_hex == "cyan":
-            cr.set_source_rgba(0.22, 0.74, 0.97, 1.0) # #38bdf8
+
+        if self.gauge_type == "pressure":
+            end_angle = start_angle + (max(0.01, self.pct) / 100.0) * (2 * math.pi)
+            cr.set_source_rgba(0.22, 0.74, 0.97, 1.0) # Cyan #38bdf8
+            cr.arc(cx, cy, r, start_angle, end_angle)
+            cr.stroke()
         else:
-            cr.set_source_rgba(0.96, 0.62, 0.04, 1.0) # #f59e0b
+            # Multi-segment memory arc (App=Blue, Wired=Pink, Compressed=Yellow)
+            curr_angle = start_angle
+            for frac, red, green, blue in self.segments:
+                seg_angle = frac * (2 * math.pi)
+                if seg_angle > 0.02:
+                    cr.set_source_rgba(red, green, blue, 1.0)
+                    cr.arc(cx, cy, r, curr_angle, curr_angle + seg_angle)
+                    cr.stroke()
+                    curr_angle += seg_angle
 
-        cr.arc(center_x, center_y, radius, start_angle, end_angle)
-        cr.stroke()
+        # 3. Draw Center Percentage Number with PangoCairo
+        layout = PangoCairo.create_layout(cr)
+        font_desc = Pango.FontDescription("Inter Bold 17")
+        layout.set_font_description(font_desc)
+        
+        pct_markup = f'<span font_weight="bold" color="#ffffff">{self.pct}%</span>'
+        layout.set_markup(pct_markup, -1)
+        ink, logical = layout.get_pixel_extents()
+        cr.move_to(cx - logical.width / 2.0, cy - logical.height / 2.0 - 5)
+        PangoCairo.show_layout(cr, layout)
 
-        # Draw Center Text (% + Title)
-        cr.set_source_rgba(1.0, 1.0, 1.0, 1.0)
-        cr.select_font_face("Inter", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-        cr.set_font_size(17)
-
-        pct_text = f"{self.pct}%"
-        x_bearing, y_bearing, t_w, t_h, x_advance, y_advance = cr.text_extents(pct_text)
-        cr.move_to(center_x - t_w / 2.0 - x_bearing, center_y - 2)
-        cr.show_text(pct_text)
-
-        # Title text
-        cr.set_source_rgba(1.0, 1.0, 1.0, 0.55)
-        cr.select_font_face("Inter", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-        cr.set_font_size(8.5)
-        x_bearing, y_bearing, t_w, t_h, x_advance, y_advance = cr.text_extents(self.title)
-        cr.move_to(center_x - t_w / 2.0 - x_bearing, center_y + 14)
-        cr.show_text(self.title)
+        # 4. Draw Subtitle Label
+        sub_desc = Pango.FontDescription("Inter Bold 8")
+        layout.set_font_description(sub_desc)
+        label_color = "#38bdf8" if self.gauge_type == "pressure" else "#f59e0b"
+        lbl_markup = f'<span font_weight="bold" color="{label_color}">{self.title}</span>'
+        layout.set_markup(lbl_markup, -1)
+        ink, logical = layout.get_pixel_extents()
+        cr.move_to(cx - logical.width / 2.0, cy + 12)
+        PangoCairo.show_layout(cr, layout)
 
         return False
 
@@ -198,7 +220,7 @@ class IStatWindow(Gtk.Window):
         super().__init__(type=Gtk.WindowType.TOPLEVEL)
         self.set_title("iStat Menus")
         self.set_role("istat_popup")
-        self.set_default_size(320, 480)
+        self.set_default_size(325, 485)
         self.set_resizable(False)
         self.set_decorated(False)
         self.set_app_paintable(True)
@@ -272,8 +294,8 @@ class IStatWindow(Gtk.Window):
         # Gauges Box
         gauges_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
         gauges_box.set_homogeneous(True)
-        self.pressure_gauge = GaugeWidget("PRESSURE", "cyan")
-        self.memory_gauge = GaugeWidget("MEMORY", "orange")
+        self.pressure_gauge = GaugeWidget("PRESSURE", "pressure")
+        self.memory_gauge = GaugeWidget("MEMORY", "memory")
         gauges_box.pack_start(self.pressure_gauge, True, True, 0)
         gauges_box.pack_start(self.memory_gauge, True, True, 0)
         main_box.pack_start(gauges_box, False, False, 0)
@@ -373,8 +395,8 @@ class IStatWindow(Gtk.Window):
 
     def update_data(self):
         stats = get_stats()
-        self.pressure_gauge.set_pct(stats["pressure_pct"])
-        self.memory_gauge.set_pct(stats["mem_pct"])
+        self.pressure_gauge.set_data(stats["pressure_pct"])
+        self.memory_gauge.set_data(stats["mem_pct"], stats["segments"])
 
         self.lbl_app.set_text(stats["app_mem"])
         self.lbl_wired.set_text(stats["wired_mem"])
