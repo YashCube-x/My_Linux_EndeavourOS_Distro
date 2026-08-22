@@ -62,7 +62,7 @@ def get_sound_stats():
                 in_sinks = True
                 continue
             if in_sinks:
-                if 'Sources:' in line or 'Sink endpoints:' in line or not line.strip() or '├─' in line and 'Devices:' in line:
+                if 'Sources:' in line or 'Sink endpoints:' in line or not line.strip() or ('├─' in line and 'Devices:' in line):
                     in_sinks = False
                     break
                 line_clean = line.replace('│', '').strip()
@@ -75,14 +75,13 @@ def get_sound_stats():
                     sink_id = parts[0].strip()
                     sink_desc = parts[1].split('[vol:')[0].strip()
                     
-                    # Clean friendly device names
                     clean_name = sink_desc
                     if 'Speaker' in sink_desc:
                         clean_name = "Laptop Built-in Speakers"
                     elif 'Headset' in sink_desc or 'AB13X' in sink_desc:
                         clean_name = "AB13X Headset / Earphones"
                     elif 'HDMI' in sink_desc:
-                        clean_name = "HDMI / DisplayPort Audio"
+                        clean_name = "HDMI Audio Output"
                     
                     sinks.append({
                         "id": sink_id,
@@ -109,7 +108,6 @@ def get_sound_stats():
                 if l_s.startswith('application.name = '):
                     app_name = l_s.split('=', 1)[1].replace('"', '').strip()
                 elif l_s.startswith('Volume:'):
-                    # e.g. front-left: 65536 / 100% / 0.00 dB
                     if '/' in l_s:
                         try:
                             pct_str = l_s.split('/')[1].replace('%', '').strip()
@@ -187,17 +185,18 @@ class SoundWindow(Gtk.Window):
                 GLib.timeout_add(150, self.update_data)
             elif val.startswith("set_master_volume:"):
                 vol = int(val.split(":")[1])
-                subprocess.Popen(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", f"{vol/100:.2f}"])
+                subprocess.Popen(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", f"{vol}%"])
             elif val.startswith("set_mic_volume:"):
                 vol = int(val.split(":")[1])
-                subprocess.Popen(["wpctl", "set-volume", "@DEFAULT_AUDIO_SOURCE@", f"{vol/100:.2f}"])
+                subprocess.Popen(["wpctl", "set-volume", "@DEFAULT_AUDIO_SOURCE@", f"{vol}%"])
             elif val.startswith("switch_sink:"):
                 sink_id = val.split(":")[1]
                 subprocess.Popen(["wpctl", "set-default", sink_id])
                 GLib.timeout_add(200, self.update_data)
             elif val.startswith("set_app_volume:"):
-                parts = val.split(":")
-                app_id, vol = parts[1], parts[2]
+                payload = val.split(":", 1)[1]
+                parts = payload.split(":")
+                app_id, vol = parts[0], parts[1]
                 subprocess.Popen(["pactl", "set-sink-input-volume", app_id, f"{vol}%"])
             elif val.startswith("toggle_app_mute:"):
                 app_id = val.split(":")[1]

@@ -36,7 +36,7 @@
             justify-content: space-between;
             width: 100%;
             height: 100%;
-            gap: 10px;
+            gap: 8px;
         }
 
         /* Header & Toggle */
@@ -89,13 +89,8 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        input:checked + .slider {
-            background-color: #3b82f6;
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(18px);
-        }
+        input:checked + .slider { background-color: #3b82f6; }
+        input:checked + .slider:before { transform: translateX(18px); }
 
         /* Connected Card */
         .conn-card {
@@ -123,6 +118,12 @@
             gap: 6px;
         }
 
+        .conn-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         .conn-ip {
             font-size: 10.5px;
             font-weight: 600;
@@ -130,6 +131,23 @@
             background: rgba(59, 130, 246, 0.2);
             padding: 2px 6px;
             border-radius: 4px;
+        }
+
+        .btn-disconnect {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #f87171;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 9.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-disconnect:hover {
+            background: #ef4444;
+            color: #ffffff;
         }
 
         .conn-details {
@@ -140,18 +158,91 @@
             font-weight: 500;
         }
 
+        /* Status Banner */
+        .status-banner {
+            display: none;
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 6px;
+            padding: 6px;
+            font-size: 10.5px;
+            font-weight: 600;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        /* Inline Password Prompt */
+        .password-box {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .password-title {
+            font-size: 10.5px;
+            font-weight: 600;
+            color: #60a5fa;
+        }
+
+        .password-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 6px 8px;
+            color: #ffffff;
+            font-size: 11.5px;
+            outline: none;
+        }
+
+        .password-input:focus {
+            border-color: #3b82f6;
+        }
+
+        .password-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+
+        .btn-pwd-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-pwd-connect {
+            background: #3b82f6;
+            border: 1px solid #60a5fa;
+            color: #ffffff;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
         /* Live Speeds & Wave */
         .speed-section {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 3px;
             padding: 0 2px;
         }
 
         .speed-row {
             display: flex;
             justify-content: space-between;
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: 600;
         }
 
@@ -162,10 +253,10 @@
             display: flex;
             align-items: flex-end;
             gap: 2px;
-            height: 28px;
+            height: 24px;
             background: rgba(255, 255, 255, 0.04);
             border-radius: 6px;
-            padding: 3px;
+            padding: 2px;
             overflow: hidden;
         }
 
@@ -179,7 +270,7 @@
 
         /* Available Networks List */
         .section-title {
-            font-size: 9.5px;
+            font-size: 9px;
             font-weight: 700;
             letter-spacing: 0.8px;
             color: #60a5fa;
@@ -190,14 +281,12 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
-            max-height: 140px;
+            max-height: 120px;
             overflow-y: auto;
             padding-right: 2px;
         }
 
-        /* Scrollbar */
         .networks-list::-webkit-scrollbar { width: 4px; }
-        .networks-list::-webkit-scrollbar-track { background: transparent; }
         .networks-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 2px; }
 
         .network-item {
@@ -207,8 +296,8 @@
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 8px;
-            padding: 6px 8px;
-            font-size: 11px;
+            padding: 5px 8px;
+            font-size: 10.5px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
@@ -267,7 +356,7 @@
             color: #ffffff;
             border-radius: 6px;
             padding: 4px 10px;
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -293,11 +382,27 @@
             </label>
         </div>
 
+        <!-- Status Banner -->
+        <div id="status-banner" class="status-banner"></div>
+
+        <!-- Inline Password Box -->
+        <div id="password-box" class="password-box">
+            <span class="password-title" id="pwd-ssid-label">Enter Password for Wi-Fi:</span>
+            <input type="password" id="pwd-input" class="password-input" placeholder="Wi-Fi Password" onkeydown="if(event.key==='Enter') submitPassword()">
+            <div class="password-actions">
+                <button class="btn-pwd-cancel" onclick="cancelPassword()">Cancel</button>
+                <button class="btn-pwd-connect" onclick="submitPassword()">Connect</button>
+            </div>
+        </div>
+
         <!-- Connected Card -->
         <div class="conn-card" id="conn-card">
             <div class="conn-top">
                 <span class="conn-ssid">📶 <span id="active-ssid">5ghz</span></span>
-                <span class="conn-ip" id="active-ip">192.168.1.17</span>
+                <div class="conn-right">
+                    <span class="conn-ip" id="active-ip">192.168.1.17</span>
+                    <button class="btn-disconnect" onclick="sendAction('disconnect')">Disconnect</button>
+                </div>
             </div>
             <div class="conn-details">
                 <span>Signal: <b id="active-signal">60%</b></span>
@@ -309,8 +414,8 @@
         <!-- Live Traffic Speeds -->
         <div class="speed-section">
             <div class="speed-row">
-                <span class="speed-down">⬇️ <span id="speed-down">1.4 MB/s</span></span>
-                <span class="speed-up">⬆️ <span id="speed-up">180 KB/s</span></span>
+                <span class="speed-down">⬇️ <span id="speed-down">0 KB/s</span></span>
+                <span class="speed-up">⬆️ <span id="speed-up">0 KB/s</span></span>
             </div>
             <div class="waveform" id="waveform"></div>
         </div>
@@ -318,7 +423,7 @@
         <!-- Available Networks -->
         <div class="section-title">AVAILABLE NETWORKS</div>
         <div class="networks-list" id="networks-list">
-            <div style="text-align:center; padding:10px; font-size:11px; color:rgba(255,255,255,0.5);">Scanning networks...</div>
+            <div style="text-align:center; padding:10px; font-size:10.5px; color:rgba(255,255,255,0.5);">Scanning networks...</div>
         </div>
 
         <!-- Bottom Actions Dock -->
@@ -330,9 +435,12 @@
     </div>
 
     <script>
+        let currentTargetSSID = '';
+        let knownSavedNetworks = [];
+
         function sendAction(action, payload) {
             if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.actionHandler) {
-                const msg = payload ? `${action}:${payload}` : action;
+                const msg = payload !== undefined ? `${action}:${payload}` : action;
                 window.webkit.messageHandlers.actionHandler.postMessage(msg);
             }
         }
@@ -341,16 +449,49 @@
             sendAction(enabled ? 'wifi_on' : 'wifi_off');
         }
 
-        function connectSSID(ssid) {
-            sendAction('connect', ssid);
+        function showStatus(text, isError) {
+            const banner = document.getElementById('status-banner');
+            banner.innerText = text;
+            banner.style.display = 'block';
+            banner.style.borderColor = isError ? '#ef4444' : '#3b82f6';
+            banner.style.background = isError ? 'rgba(239, 68, 68, 0.25)' : 'rgba(59, 130, 246, 0.25)';
+            setTimeout(() => { banner.style.display = 'none'; }, 4000);
+        }
+
+        function handleConnectClick(ssid, isSecured) {
+            currentTargetSSID = ssid;
+            // Check if network is saved or open
+            if (!isSecured || knownSavedNetworks.includes(ssid)) {
+                showStatus(`Connecting to ${ssid}...`, false);
+                sendAction('connect_saved', ssid);
+            } else {
+                // Show password prompt
+                document.getElementById('pwd-ssid-label').innerText = `Enter Password for "${ssid}":`;
+                document.getElementById('pwd-input').value = '';
+                document.getElementById('password-box').style.display = 'flex';
+                document.getElementById('pwd-input').focus();
+            }
+        }
+
+        function cancelPassword() {
+            document.getElementById('password-box').style.display = 'none';
+            currentTargetSSID = '';
+        }
+
+        function submitPassword() {
+            const pwd = document.getElementById('pwd-input').value;
+            if (!pwd) return;
+            document.getElementById('password-box').style.display = 'none';
+            showStatus(`Connecting to ${currentTargetSSID}...`, false);
+            sendAction('connect_with_password', `${currentTargetSSID}::${pwd}`);
         }
 
         // Init wave bars
         const waveContainer = document.getElementById('waveform');
-        for (let i = 0; i < 28; i++) {
+        for (let i = 0; i < 30; i++) {
             const bar = document.createElement('div');
             bar.className = 'wave-bar';
-            bar.style.height = (Math.random() * 20 + 3) + 'px';
+            bar.style.height = (Math.random() * 18 + 2) + 'px';
             waveContainer.appendChild(bar);
         }
 
@@ -358,6 +499,7 @@
             if (!data) return;
 
             document.getElementById('wifi-toggle').checked = data.enabled;
+            knownSavedNetworks = data.saved_networks || [];
 
             if (data.connected && data.connected.ssid) {
                 document.getElementById('conn-card').style.display = 'flex';
@@ -381,17 +523,23 @@
                 let html = '';
                 data.networks.forEach(net => {
                     const isConnected = data.connected && data.connected.ssid === net.ssid;
-                    const secIcon = net.security.includes('WPA') ? '🔒' : '🔓';
+                    const isSecured = net.security.includes('WPA');
+                    const secIcon = isSecured ? '🔒' : '🔓';
+                    const isSaved = knownSavedNetworks.includes(net.ssid);
+
                     html += `
-                        <div class="network-item" onclick="connectSSID('${net.ssid}')">
+                        <div class="network-item" onclick="handleConnectClick('${net.ssid}', ${isSecured})">
                             <div class="net-left">
                                 <span>📶</span>
                                 <span>${net.ssid}</span>
                             </div>
                             <div class="net-right">
-                                <span style="font-size:10px; opacity:0.6;">${net.signal}%</span>
-                                <span>${secIcon}</span>
-                                ${isConnected ? '<span style="color:#a6e3a1; font-weight:700; font-size:10px;">Connected</span>' : `<button class="btn-connect" onclick="event.stopPropagation(); connectSSID('${net.ssid}')">Connect</button>`}
+                                <span style="font-size:9.5px; opacity:0.6;">${net.signal}%</span>
+                                <span style="font-size:10px;">${secIcon}</span>
+                                ${isConnected 
+                                    ? '<span style="color:#a6e3a1; font-weight:700; font-size:10px;">Connected</span>' 
+                                    : `<button class="btn-connect" onclick="event.stopPropagation(); handleConnectClick('${net.ssid}', ${isSecured})">${isSaved ? 'Connect' : 'Join'}</button>`
+                                }
                             </div>
                         </div>
                     `;

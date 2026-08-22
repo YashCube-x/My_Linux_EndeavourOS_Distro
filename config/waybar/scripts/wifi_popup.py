@@ -30,7 +30,6 @@ if os.path.exists(PID_FILE):
 with open(PID_FILE, 'w') as f:
     f.write(str(os.getpid()))
 
-# Traffic state
 prev_time = time.time()
 prev_rx = 0
 prev_tx = 0
@@ -51,10 +50,25 @@ def get_net_bytes():
 
 prev_rx, prev_tx = get_net_bytes()
 
+def get_saved_connections():
+    saved = []
+    try:
+        out = subprocess.check_output(
+            ["nmcli", "-t", "-f", "NAME,TYPE", "connection", "show"],
+            universal_newlines=True
+        )
+        for line in out.strip().split('\n'):
+            parts = line.split(':')
+            if len(parts) >= 2 and parts[1] == "802-11-wireless":
+                saved.append(parts[0].strip())
+    except Exception:
+        pass
+    return saved
+
 def get_wifi_stats():
     global prev_time, prev_rx, prev_tx
     
-    # 1. Wi-Fi Enabled State
+    # 1. Wi-Fi Enabled
     enabled = True
     try:
         out = subprocess.check_output(["nmcli", "radio", "wifi"], universal_newlines=True).strip()
@@ -72,7 +86,10 @@ def get_wifi_stats():
     except Exception:
         pass
 
-    # 3. Wi-Fi Scan & Active Connection
+    # 3. Known saved networks
+    saved_networks = get_saved_connections()
+
+    # 4. Active & Available Networks
     connected = None
     networks = []
     seen_ssids = set()
@@ -117,7 +134,7 @@ def get_wifi_stats():
     except Exception:
         pass
 
-    # 4. Speeds Calculation
+    # 5. Speeds Calculation
     curr_time = time.time()
     curr_rx, curr_tx = get_net_bytes()
     dt = max(0.2, curr_time - prev_time)
@@ -135,6 +152,7 @@ def get_wifi_stats():
     return {
         "enabled": enabled,
         "connected": connected,
+        "saved_networks": saved_networks,
         "speed": {
             "down": fmt_speed(down_bps),
             "up": fmt_speed(up_bps)
@@ -147,7 +165,7 @@ class WifiWindow(Gtk.Window):
         super().__init__(type=Gtk.WindowType.TOPLEVEL)
         self.set_title("iStat Menus - WiFi")
         self.set_role("wifi_popup")
-        self.set_default_size(320, 430)
+        self.set_default_size(320, 440)
         self.set_resizable(False)
         self.set_decorated(False)
         self.set_app_paintable(True)
@@ -192,16 +210,26 @@ class WifiWindow(Gtk.Window):
             elif val == "wifi_off":
                 subprocess.Popen(["nmcli", "radio", "wifi", "off"])
                 GLib.timeout_add(800, self.update_data)
+            elif val == "disconnect":
+                subprocess.Popen(["nmcli", "dev", "disconnect", "wlan0"])
+                GLib.timeout_add(800, self.update_data)
             elif val == "rescan":
                 subprocess.Popen(["nmcli", "dev", "wifi", "rescan"])
                 GLib.timeout_add(1200, self.update_data)
             elif val == "settings":
                 subprocess.Popen(["nm-connection-editor"])
                 self.destroy()
-            elif val.startswith("connect:"):
+            elif val.startswith("connect_saved:"):
                 ssid = val.split(":", 1)[1]
-                subprocess.Popen(["kitty", "-e", "nmcli", "dev", "wifi", "connect", ssid, "--ask"])
-                self.destroy()
+                # Try connection up first, or dev wifi connect
+                subprocess.Popen(["nmcli", "connection", "up", "id", ssid])
+                GLib.timeout_add(1500, self.update_data)
+            elif val.startswith("connect_with_password:"):
+                payload = val.split(":", 1)[1]
+                if "::" in payload:
+                    ssid, pwd = payload.split("::", 1)
+                    subprocess.Popen(["nmcli", "dev", "wifi", "connect", ssid, "password", pwd])
+                    GLib.timeout_add(2000, self.update_data)
         except Exception:
             pass
 
