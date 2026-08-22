@@ -464,3 +464,11 @@ hl.window_rule({
 
     no_focus = true,
 })
+
+hl.layer_rule({
+    -- Frosted glass blur effect for Waybar
+    name  = "waybar-blur",
+    match = { namespace = "^(waybar)$" },
+    blur  = true,
+})
+

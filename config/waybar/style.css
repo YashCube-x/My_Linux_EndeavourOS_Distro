@@ -1,217 +1,205 @@
-@define-color crust      #12141d;
-@define-color separator  #2a2d3a;
-@define-color muted      #7a8296;
-
-@define-color launcher-bg   #3d2f6b;
-@define-color launcher-fg   #c9b8ff;
-
-@define-color ws-active     #8fb0e8;
-
-@define-color ram-bg    #5ecb8a;
-@define-color ram-fg    #0d1f14;
-@define-color cpu-bg    #f0a93e;
-@define-color cpu-fg    #241505;
-@define-color disk-bg   #5ecfe0;
-@define-color disk-fg   #08191c;
-
-@define-color bright-bg #f0c65e;
-@define-color bright-fg #211a04;
-@define-color wifi-bg   #a48ff0;
-@define-color wifi-fg   #1c1330;
-@define-color bt-bg     #5edfe8;
-@define-color bt-fg     #062023;
-@define-color vol-bg    #7ea6f0;
-@define-color vol-fg    #0c1c33;
-
-@define-color batt-bg   #f08a94;
-@define-color batt-fg   #2b0a0e;
-
-@define-color clock-bg  #c9b8ff;
-@define-color clock-fg  #1a1424;
+/* =============================================================================
+   macOS Frosted Transparent Glassmorphism Theme for Waybar
+   ============================================================================= */
 
 * {
-    font-family: "JetBrainsMono Nerd Font", "JetBrainsMono Nerd Font Mono", sans-serif;
-    font-size: 11.5px;
-    font-weight: 600;
+    font-family: "JetBrainsMono Nerd Font", "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
     min-height: 0;
+    border: none;
+    text-shadow: none;
 }
 
 window#waybar {
-    background: @crust;
+    background-color: rgba(18, 20, 30, 0.52);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+    color: #e2e8f0;
+    transition: all 0.3s ease;
 }
 
-/* --- Left side --- */
+/* --- Left Section (Apple & Workspaces) --- */
 
 #custom-launcher {
-    background-color: @launcher-bg;
-    color: @launcher-fg;
-    border-radius: 0;
-    font-weight: bold;
-    padding: 0;
-    margin: 0;
-    min-width: 27px;
+    font-size: 15px;
+    color: #ffffff;
+    background-color: transparent;
+    padding: 0 10px;
+    margin: 3px 2px 3px 6px;
+    border-radius: 6px;
+    transition: all 0.2s ease-in-out;
+}
+
+#custom-launcher:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
 }
 
 #workspaces {
-    margin: 0;
+    margin: 3px 4px;
     padding: 0;
 }
 
 #workspaces button {
     background-color: transparent;
-    color: @muted;
-    border-radius: 0;
-    padding: 0 6px;
-    margin: 0;
+    color: rgba(255, 255, 255, 0.45);
+    border-radius: 6px;
+    padding: 0 7px;
+    margin: 0 1px;
+    font-size: 11.5px;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
 }
 
 #workspaces button.active {
-    color: @ws-active;
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
 #workspaces button:hover {
-    color: @launcher-fg;
-    background-color: transparent;
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.10);
 }
 
 #window {
-    color: @muted;
-    border-left: 1px solid @separator;
-    padding: 0 10px;
-    margin: 0;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 600;
+    font-size: 11.5px;
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 0 12px;
+    margin: 3px 0;
 }
 
-/* --- Right side: sharp-cornered, tight-padded blocks --- */
+/* --- Right Section (macOS Control Center Style) --- */
 
 #memory,
 #cpu,
 #disk,
 #custom-tablet,
 #backlight,
-#custom-brightness,
 #custom-wifi,
 #custom-bluetooth,
 #pulseaudio,
-#custom-volume,
 #battery,
-#clock {
-    border-radius: 0;
-    padding: 0 6px;
-    margin: 0;
+#custom-notification,
+#clock,
+#custom-power {
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.85);
+    border-radius: 6px;
+    padding: 0 7px;
+    margin: 3px 1px;
+    transition: all 0.2s ease-in-out;
 }
 
-#memory {
-    background-color: @ram-bg;
-    color: @ram-fg;
+#memory:hover,
+#cpu:hover,
+#disk:hover,
+#custom-tablet:hover,
+#backlight:hover,
+#custom-wifi:hover,
+#custom-bluetooth:hover,
+#pulseaudio:hover,
+#battery:hover,
+#custom-notification:hover,
+#clock:hover,
+#custom-power:hover {
+    background-color: rgba(255, 255, 255, 0.13);
+    color: #ffffff;
 }
 
-#cpu {
-    background-color: @cpu-bg;
-    color: @cpu-fg;
-}
-
-#disk {
-    background-color: @disk-bg;
-    color: @disk-fg;
-}
-
+/* Tablet Toggle Styling */
 #custom-tablet.connected {
-    background-color: #a6e3a1;
-    color: #11111b;
+    color: #a6e3a1;
+    background-color: rgba(166, 227, 161, 0.18);
 }
 
 #custom-tablet.disconnected {
-    background-color: #313244;
-    color: #a6adc8;
+    color: rgba(255, 255, 255, 0.35);
 }
 
-#backlight,
-#custom-brightness {
-    background-color: @bright-bg;
-    color: @bright-fg;
+/* Hardware indicators subtle highlights */
+#memory {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 11px;
 }
 
-#custom-wifi {
-    background-color: @wifi-bg;
-    color: @wifi-fg;
+#cpu {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 11px;
 }
 
+#disk {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 11px;
+}
+
+/* Wireless disconnected states */
 #custom-wifi.off,
 #custom-wifi.disconnected {
-    background-color: @separator;
-    color: @muted;
-}
-
-#custom-bluetooth {
-    background-color: @bt-bg;
-    color: @bt-fg;
+    color: rgba(255, 255, 255, 0.30);
 }
 
 #custom-bluetooth.off,
 #custom-bluetooth.disconnected {
-    background-color: @separator;
-    color: @muted;
+    color: rgba(255, 255, 255, 0.30);
 }
 
-#pulseaudio,
-#custom-volume {
-    background-color: @vol-bg;
-    color: @vol-fg;
-}
-
-#battery {
-    background-color: @batt-bg;
-    color: @batt-fg;
-}
-
+/* Battery States */
 #battery.charging {
-    background-color: @ram-bg;
-    color: @ram-fg;
+    color: #a6e3a1;
 }
 
 #battery.warning:not(.charging) {
-    background-color: @cpu-bg;
-    color: @cpu-fg;
+    color: #f9e2af;
 }
 
 #battery.critical:not(.charging) {
-    background-color: @batt-bg;
-    color: @batt-fg;
+    color: #f38ba8;
 }
 
+/* Clock - macOS Typography */
 #clock {
-    background-color: @clock-bg;
-    color: @clock-fg;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 11.5px;
+    padding: 0 9px;
+    margin: 3px 3px;
 }
 
-/* Power button: sharp corners, filled per spec */
-#custom-power {
-    background-color: @batt-bg;
-    color: @batt-fg;
-    border-radius: 0;
-    padding: 0 8px;
-    margin: 0;
-}
-
-/* Notification toggle: no fill, muted icon, only shown if mako is installed */
+/* Notification Bell */
 #custom-notification {
-    background-color: @crust;
-    color: @muted;
-    border-radius: 0;
-    padding: 0 8px;
-    margin: 0;
+    color: rgba(255, 255, 255, 0.75);
+    padding: 0 6px;
 }
 
 #custom-notification.dnd {
-    color: @batt-bg;
+    color: #f38ba8;
 }
 
+/* Power Button */
+#custom-power {
+    color: rgba(255, 255, 255, 0.85);
+    padding: 0 8px;
+    margin-right: 6px;
+}
+
+#custom-power:hover {
+    color: #f38ba8;
+    background-color: rgba(243, 139, 168, 0.18);
+}
+
+/* Tooltip - Frosted Glass Card */
 tooltip {
-    background: @crust;
-    border: 1px solid @separator;
-    border-radius: 0;
+    background-color: rgba(20, 22, 34, 0.90);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    padding: 6px 10px;
 }
 
 tooltip label {
-    color: #c5cadd;
+    color: #f1f5f9;
+    font-size: 11.5px;
 }

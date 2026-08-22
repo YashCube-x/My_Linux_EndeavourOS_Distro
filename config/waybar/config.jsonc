@@ -2,32 +2,31 @@
     "output": ["eDP-1", "HDMI-A-1"],
     "layer": "top",
     "position": "top",
-    "height": 27,
+    "height": 30,
     "spacing": 0,
 
     "modules-left": ["custom/launcher", "hyprland/workspaces", "hyprland/window"],
     "modules-right": ["memory", "cpu", "disk", "custom/tablet", "backlight", "custom/wifi", "custom/bluetooth", "pulseaudio", "battery", "custom/notification", "clock", "custom/power"],
 
     "custom/launcher": {
-        "format": "e",
+        "format": "",
         "on-click": "~/.config/hypr/scripts/smart_menu.sh",
-        "tooltip": "Search Applications"
+        "tooltip": "Applications Menu"
     },
-
 
     "hyprland/workspaces": {
         "format": "{icon}",
         "format-icons": {
-            "1": "I",
-            "2": "II",
-            "3": "III",
-            "4": "IV",
-            "5": "V",
-            "6": "VI",
-            "7": "VII",
-            "8": "VIII",
-            "9": "IX",
-            "10": "X"
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4",
+            "5": "5",
+            "6": "6",
+            "7": "7",
+            "8": "8",
+            "9": "9",
+            "10": "10"
         },
         "on-click": "activate",
         "sort-by-number": true,
@@ -38,14 +37,14 @@
 
     "hyprland/window": {
         "format": "{title}",
-        "max-length": 60,
+        "max-length": 50,
         "separate-outputs": true
     },
 
     "memory": {
         "format": "RAM {percentage}%",
         "interval": 2,
-        "tooltip-format": "RAM {used:0.1f}GiB / {total:0.1f}GiB"
+        "tooltip-format": "RAM: {used:0.1f}GiB / {total:0.1f}GiB"
     },
 
     "cpu": {
@@ -55,10 +54,10 @@
     },
 
     "disk": {
-        "format": "DISK {percentage_used}%",
+        "format": "SSD {percentage_used}%",
         "path": "/",
         "interval": 30,
-        "tooltip-format": "{used} used / {total} ({free} free)"
+        "tooltip-format": "SSD: {used} used / {total} ({free} free)"
     },
 
     "custom/tablet": {
@@ -108,7 +107,6 @@
         "tooltip": false
     },
 
-
     "battery": {
         "interval": 30,
         "states": {
@@ -129,7 +127,7 @@
     },
 
     "clock": {
-        "format": "{:%H:%M %a}",
+        "format": "{:%a %b %d  %I:%M %p}",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
     },
 
