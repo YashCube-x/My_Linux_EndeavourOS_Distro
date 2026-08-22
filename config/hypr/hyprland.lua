@@ -456,7 +456,7 @@ hl.window_rule({
     float       = true,
     pin         = true,
     border_size = 0,
-    size        = { 330, 495 },
+    size        = { 320, 395 },
     move        = { 1080, 34 },
     animation   = "slide top",
 })
@@ -469,7 +469,7 @@ hl.window_rule({
     float       = true,
     pin         = true,
     border_size = 0,
-    size        = { 330, 495 },
+    size        = { 320, 395 },
     move        = { 1140, 34 },
     animation   = "slide top",
 })
@@ -482,7 +482,7 @@ hl.window_rule({
     float       = true,
     pin         = true,
     border_size = 0,
-    size        = { 330, 495 },
+    size        = { 320, 395 },
     move        = { 1200, 34 },
     animation   = "slide top",
 })
@@ -495,7 +495,7 @@ hl.window_rule({
     float       = true,
     pin         = true,
     border_size = 0,
-    size        = { 330, 495 },
+    size        = { 320, 395 },
     animation   = "slide top",
 })
 

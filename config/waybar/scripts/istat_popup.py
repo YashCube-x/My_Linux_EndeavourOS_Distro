@@ -230,11 +230,10 @@ class IStatWindow(Gtk.Window):
     def __init__(self):
         super().__init__(type=Gtk.WindowType.TOPLEVEL)
         
-        # Set distinct window title for Hyprland positioning
         title_suffix = TARGET_VIEW.upper()
         self.set_title(f"iStat Menus - {title_suffix}")
         self.set_role(f"istat_popup_{TARGET_VIEW}")
-        self.set_default_size(328, 490)
+        self.set_default_size(320, 395)
         self.set_resizable(False)
         self.set_decorated(False)
         self.set_app_paintable(True)
@@ -243,6 +242,16 @@ class IStatWindow(Gtk.Window):
         visual = screen.get_rgba_visual()
         if visual and screen.is_composited():
             self.set_visual(visual)
+
+        # Transparent GTK CSS
+        css_provider = Gtk.CssProvider()
+        css_provider.load_from_data(b"""
+            window {
+                background-color: transparent;
+                background: none;
+            }
+        """)
+        Gtk.StyleContext.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
         self.webview = WebKit2.WebView()
         self.webview.set_background_color(Gdk.RGBA(0, 0, 0, 0))
