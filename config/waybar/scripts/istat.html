@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iStat Menus</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", sans-serif;
+            background: transparent;
+            color: #f1f5f9;
+            padding: 6px;
+            overflow: hidden;
+        }
+
+        .card {
+            background: rgba(22, 27, 46, 0.90);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            border-radius: 16px;
+            padding: 16px 14px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* --- Gauges Header --- */
+        .gauges-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 4px 0 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .gauge-box {
+            position: relative;
+            width: 95px;
+            height: 95px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .gauge-box svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .gauge-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.08);
+            stroke-width: 6;
+        }
+
+        .gauge-pressure-bar {
+            fill: none;
+            stroke: #38bdf8;
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-dasharray: 251;
+            stroke-dashoffset: 140;
+            transition: stroke-dashoffset 0.6s ease;
+        }
+
+        .gauge-memory-bar {
+            fill: none;
+            stroke: #f59e0b;
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-dasharray: 251;
+            stroke-dashoffset: 70;
+            transition: stroke-dashoffset 0.6s ease;
+        }
+
+        .gauge-text {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .gauge-pct {
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+        }
+
+        .gauge-label {
+            font-size: 8.5px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            color: rgba(255, 255, 255, 0.55);
+            margin-top: 1px;
+        }
+
+        /* --- Memory Breakdown List --- */
+        .mem-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            font-size: 11.5px;
+            padding: 2px 4px;
+        }
+
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .row-left {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+        }
+
+        .dot-blue { background-color: #3b82f6; }
+        .dot-pink { background-color: #ec4899; }
+        .dot-yellow { background-color: #eab308; }
+        .dot-grey { background-color: #64748b; }
+
+        .row-right {
+            font-weight: 600;
+            color: #ffffff;
+            letter-spacing: -0.2px;
+        }
+
+        /* --- Processes Section --- */
+        .section-title {
+            font-size: 9.5px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            color: #60a5fa;
+            margin-top: 4px;
+            padding-left: 4px;
+        }
+
+        .processes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 0 4px;
+        }
+
+        .process-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+        }
+
+        .process-name {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255, 255, 255, 0.88);
+            font-weight: 500;
+            max-width: 170px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .process-icon {
+            font-size: 10px;
+            opacity: 0.8;
+        }
+
+        .process-size {
+            font-weight: 600;
+            color: #ffffff;
+            letter-spacing: -0.2px;
+        }
+
+        /* --- Swap Bar --- */
+        .swap-section {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 4px 4px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .swap-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10.5px;
+            font-weight: 600;
+        }
+
+        .swap-label {
+            color: #60a5fa;
+            letter-spacing: 0.5px;
+        }
+
+        .swap-val {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 4.5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 25%;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* --- Bottom Dock / Actions --- */
+        .bottom-dock {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .dock-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .dock-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.08);
+        }
+
+        .dock-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!-- Circular Gauges Header -->
+        <div class="gauges-container">
+            <!-- Pressure Gauge -->
+            <div class="gauge-box">
+                <svg viewBox="0 0 90 90">
+                    <circle class="gauge-bg" cx="45" cy="45" r="38"></circle>
+                    <circle id="pressure-circle" class="gauge-pressure-bar" cx="45" cy="45" r="38"></circle>
+                </svg>
+                <div class="gauge-text">
+                    <span id="pressure-val" class="gauge-pct">18%</span>
+                    <span class="gauge-label">PRESSURE</span>
+                </div>
+            </div>
+
+            <!-- Memory Gauge -->
+            <div class="gauge-box">
+                <svg viewBox="0 0 90 90">
+                    <circle class="gauge-bg" cx="45" cy="45" r="38"></circle>
+                    <circle id="memory-circle" class="gauge-memory-bar" cx="45" cy="45" r="38"></circle>
+                </svg>
+                <div class="gauge-text">
+                    <span id="mem-val" class="gauge-pct">58%</span>
+                    <span class="gauge-label">MEMORY</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Memory Breakdown -->
+        <div class="mem-breakdown">
+            <div class="breakdown-row">
+                <div class="row-left"><span class="dot dot-blue"></span> App</div>
+                <div id="app-mem" class="row-right">5.8 GB</div>
+            </div>
+            <div class="breakdown-row">
+                <div class="row-left"><span class="dot dot-pink"></span> Wired</div>
+                <div id="wired-mem" class="row-right">1.2 GB</div>
+            </div>
+            <div class="breakdown-row">
+                <div class="row-left"><span class="dot dot-yellow"></span> Compressed</div>
+                <div id="compressed-mem" class="row-right">4.1 GB</div>
+            </div>
+            <div class="breakdown-row">
+                <div class="row-left"><span class="dot dot-grey"></span> Free</div>
+                <div id="free-mem" class="row-right">11.9 GB</div>
+            </div>
+        </div>
+
+        <!-- Top Processes -->
+        <div class="section-title">PROCESSES</div>
+        <div id="processes-list" class="processes-list">
+            <div class="process-item">
+                <div class="process-name"><span class="process-icon">🌐</span> Firefox Browser</div>
+                <div class="process-size">2.1 GB</div>
+            </div>
+            <div class="process-item">
+                <div class="process-name"><span class="process-icon">💻</span> Antigravity IDE</div>
+                <div class="process-size">850 MB</div>
+            </div>
+            <div class="process-item">
+                <div class="process-name"><span class="process-icon">🤖</span> Claude Code</div>
+                <div class="process-size">480 MB</div>
+            </div>
+            <div class="process-item">
+                <div class="process-name"><span class="process-icon">📱</span> Tablet Share</div>
+                <div class="process-size">120 MB</div>
+            </div>
+            <div class="process-item">
+                <div class="process-name"><span class="process-icon">⚡</span> Hyprland</div>
+                <div class="process-size">95 MB</div>
+            </div>
+        </div>
+
+        <!-- Swap Bar -->
+        <div class="swap-section">
+            <div class="swap-header">
+                <span class="swap-label">SWAP</span>
+                <span id="swap-val" class="swap-val">0 MB of 19.0 GB</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div id="swap-fill" class="progress-bar-fill" style="width: 2%;"></div>
+            </div>
+        </div>
+
+        <!-- Bottom Actions Dock -->
+        <div class="bottom-dock">
+            <div class="dock-btn" onclick="sendAction('btop')" title="Activity Monitor">📊</div>
+            <div class="dock-btn" onclick="sendAction('terminal')" title="Terminal">💻</div>
+            <div class="dock-btn" onclick="sendAction('clean')" title="Sync & Clean RAM">🧹</div>
+            <div class="dock-btn" onclick="sendAction('close')" title="Close">✕</div>
+        </div>
+    </div>
+
+    <script>
+        const CIRCLE_CIRCUMFERENCE = 2 * Math.PI * 38; // ~238.76
+
+        function sendAction(action) {
+            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.actionHandler) {
+                window.webkit.messageHandlers.actionHandler.postMessage(action);
+            }
+        }
+
+        window.updateStats = function(data) {
+            if (!data) return;
+
+            // Update Pressure Gauge
+            const pPct = data.pressure_pct || 0;
+            document.getElementById('pressure-val').innerText = pPct + '%';
+            const pOffset = CIRCLE_CIRCUMFERENCE - (pPct / 100) * CIRCLE_CIRCUMFERENCE;
+            document.getElementById('pressure-circle').style.strokeDashoffset = pOffset;
+
+            // Update Memory Gauge
+            const mPct = data.mem_pct || 0;
+            document.getElementById('mem-val').innerText = mPct + '%';
+            const mOffset = CIRCLE_CIRCUMFERENCE - (mPct / 100) * CIRCLE_CIRCUMFERENCE;
+            document.getElementById('memory-circle').style.strokeDashoffset = mOffset;
+
+            // Memory breakdown
+            document.getElementById('app-mem').innerText = data.app_mem;
+            document.getElementById('wired-mem').innerText = data.wired_mem;
+            document.getElementById('compressed-mem').innerText = data.compressed_mem;
+            document.getElementById('free-mem').innerText = data.free_mem;
+
+            // Swap
+            document.getElementById('swap-val').innerText = `${data.swap_used} of ${data.swap_total}`;
+            document.getElementById('swap-fill').style.width = Math.max(2, data.swap_pct) + '%';
+
+            // Top Processes
+            if (data.processes && data.processes.length > 0) {
+                let html = '';
+                data.processes.forEach(p => {
+                    let icon = '⚡';
+                    const lower = p.name.toLowerCase();
+                    if (lower.includes('firefox') || lower.includes('chrome')) icon = '🌐';
+                    else if (lower.includes('antigravity') || lower.includes('ide') || lower.includes('code')) icon = '💻';
+                    else if (lower.includes('claude')) icon = '🤖';
+                    else if (lower.includes('tablet') || lower.includes('vnc')) icon = '📱';
+                    else if (lower.includes('node') || lower.includes('server')) icon = '⚙️';
+                    else if (lower.includes('terminal') || lower.includes('kitty')) icon = '⌨️';
+
+                    html += `
+                        <div class="process-item">
+                            <div class="process-name"><span class="process-icon">${icon}</span> ${p.name}</div>
+                            <div class="process-size">${p.size}</div>
+                        </div>
+                    `;
+                });
+                document.getElementById('processes-list').innerHTML = html;
+            }
+        };
+    </script>
+</body>
+</html>

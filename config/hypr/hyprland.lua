@@ -448,6 +448,17 @@ hl.window_rule({
     center = true,
 })
 
+hl.window_rule({
+    -- macOS iStat Menus System Widget Popup
+    name  = "istat-popup-window",
+    match = { class = "^(istat_popup)$" },
+
+    float       = true,
+    pin         = true,
+    border_size = 0,
+    size        = { 330, 520 },
+})
+
 
 
 hl.window_rule({
