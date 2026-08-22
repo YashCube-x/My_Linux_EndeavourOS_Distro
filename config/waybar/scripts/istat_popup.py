@@ -144,7 +144,7 @@ class IStatPopup(Gtk.Window):
     def __init__(self):
         super().__init__(type=Gtk.WindowType.TOPLEVEL)
         self.set_title("iStat Menus")
-        self.set_default_size(325, 485)
+        self.set_default_size(330, 490)
         self.set_app_paintable(True)
 
         # Initialize GtkLayerShell for native Wayland layer surface
@@ -152,6 +152,11 @@ class IStatPopup(Gtk.Window):
         GtkLayerShell.set_layer(self, GtkLayerShell.Layer.OVERLAY)
         GtkLayerShell.set_namespace(self, "istat-popup")
         
+        # Explicitly set monitor to Main Laptop Screen (Monitor 0 / eDP-1)
+        display = Gdk.Display.get_default()
+        if display and display.get_n_monitors() > 0:
+            GtkLayerShell.set_monitor(self, display.get_monitor(0))
+
         # Anchor to Top-Right
         GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.TOP, True)
         GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.RIGHT, True)
