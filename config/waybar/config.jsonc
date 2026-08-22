@@ -9,9 +9,9 @@
     "modules-right": ["custom/system_stats", "custom/tablet", "backlight", "custom/wifi", "custom/bluetooth", "pulseaudio", "battery", "custom/notification", "clock", "custom/power"],
 
     "custom/launcher": {
-        "format": "",
+        "format": "",
         "on-click": "~/.config/hypr/scripts/smart_menu.sh",
-        "tooltip": "Applications Menu"
+        "tooltip": "EndeavourOS Applications Menu"
     },
 
     "hyprland/workspaces": {
