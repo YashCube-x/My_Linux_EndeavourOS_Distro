@@ -449,6 +449,19 @@ hl.window_rule({
 })
 
 hl.window_rule({
+    -- macOS Wi-Fi Manager Popup
+    name  = "istat-popup-wifi",
+    match = { title = "^(iStat Menus - WiFi)$" },
+
+    float       = true,
+    pin         = true,
+    border_size = 0,
+    size        = { 320, 430 },
+    move        = { 1380, 34 },
+    animation   = "slide top",
+})
+
+hl.window_rule({
     -- macOS iStat Menus System Widget Popup - Unified Single Icon Dropdown
     name  = "istat-popup-window",
     match = { title = "^(iStat Menus.*)$" },
