@@ -3,7 +3,7 @@
     "layer": "top",
     "position": "top",
     "height": 30,
-    "spacing": 0,
+    "spacing": 14,
 
     "modules-left": ["custom/launcher", "hyprland/workspaces", "hyprland/window"],
     "modules-right": ["custom/system_stats", "custom/tablet", "backlight", "custom/wifi", "custom/bluetooth", "pulseaudio", "battery", "custom/notification", "clock", "custom/power"],

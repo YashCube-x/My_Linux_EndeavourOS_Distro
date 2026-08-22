@@ -4,10 +4,10 @@ if [ "$(nmcli radio wifi)" != "enabled" ]; then
     exit 0
 fi
 
-SSID=$(nmcli -t -f active,ssid dev wifi | awk -F: '$1=="yes"{print $2; exit}')
+SSID=$(nmcli -t -f active,ssid dev wifi | awk -F: '$1=="yes"{print $2; exit}' | xargs)
 
 if [ -z "$SSID" ]; then
-    printf '{"text": " Disconnected", "class": "disconnected", "tooltip": "Not connected"}\n'
+    printf '{"text": " Off", "class": "disconnected", "tooltip": "Not connected"}\n'
 else
     printf '{"text": " %s", "class": "connected", "tooltip": "Connected to %s"}\n' "$SSID" "$SSID"
 fi
