@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sound Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        html, body {
+            background-color: transparent !important;
+            background: transparent !important;
+            color: #f1f5f9;
+            font-family: "SF Pro Display", "SF Pro Text", "SF Pro", -apple-system, sans-serif;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+
+        .card {
+            background: rgba(22, 27, 46, 0.96);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 14px 12px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            gap: 10px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4px;
+        }
+
+        .title {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Master Slider Card */
+        .volume-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .vol-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .vol-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #ffffff;
+        }
+
+        .vol-btn-mute {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .vol-btn-mute:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .vol-btn-mute.muted {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: #ef4444;
+            color: #f87171;
+        }
+
+        /* Custom Slider Range */
+        .slider-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .custom-range {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.15);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .custom-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+            transition: transform 0.1s ease;
+        }
+
+        .custom-range::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        /* Section Titles */
+        .section-title {
+            font-size: 9.5px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            color: #60a5fa;
+            padding-left: 2px;
+            margin-top: 2px;
+        }
+
+        /* Devices List */
+        .devices-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .device-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 6px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .device-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .device-item.active {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.4);
+            color: #ffffff;
+        }
+
+        .dev-left {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-weight: 500;
+            max-width: 220px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .check-dot {
+            color: #3b82f6;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        /* App Voices Section */
+        .apps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 110px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+
+        .apps-list::-webkit-scrollbar { width: 4px; }
+        .apps-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 2px; }
+
+        .app-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 6px 8px;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10.5px;
+            font-weight: 600;
+        }
+
+        .app-title {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Equalizer Waveform */
+        .waveform {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 22px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            padding: 2px;
+            overflow: hidden;
+        }
+
+        .wave-bar {
+            flex: 1;
+            background: linear-gradient(0deg, #3b82f6 50%, #ec4899 50%);
+            border-radius: 1px;
+            min-height: 2px;
+            transition: height 0.2s ease;
+        }
+
+        /* Bottom Actions Dock */
+        .bottom-dock {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-top: 4px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .dock-btn {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dock-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!-- Header -->
+        <div class="header">
+            <span class="title">🔊 Sound & Audio</span>
+            <span id="master-vol-badge" style="font-size:11px; font-weight:700; color:#38bdf8;">80%</span>
+        </div>
+
+        <!-- Master Output Slider -->
+        <div class="volume-card">
+            <div class="vol-top">
+                <span class="vol-label">🔊 Master Output</span>
+                <button id="btn-master-mute" class="vol-btn-mute" onclick="sendAction('toggle_master_mute')">Mute</button>
+            </div>
+            <div class="slider-container">
+                <input type="range" id="master-slider" class="custom-range" min="0" max="100" value="80" oninput="onMasterVolChange(this.value)">
+            </div>
+        </div>
+
+        <!-- Output Devices -->
+        <div class="section-title">OUTPUT DEVICE</div>
+        <div class="devices-list" id="sinks-list"></div>
+
+        <!-- Per-App Voice Controls -->
+        <div class="section-title">APP VOICES & STREAMS</div>
+        <div class="apps-list" id="apps-list">
+            <div style="text-align:center; padding:6px; font-size:10.5px; color:rgba(255,255,255,0.5);">No active audio streams</div>
+        </div>
+
+        <!-- Microphone Input -->
+        <div class="volume-card" style="padding:6px 10px;">
+            <div class="vol-top" style="font-size:11px;">
+                <span class="vol-label">🎙️ Microphone Input (<span id="mic-val">84%</span>)</span>
+                <button id="btn-mic-mute" class="vol-btn-mute" onclick="sendAction('toggle_mic_mute')">Mute</button>
+            </div>
+            <div class="slider-container" style="margin-top:4px;">
+                <input type="range" id="mic-slider" class="custom-range" min="0" max="100" value="84" oninput="onMicVolChange(this.value)">
+            </div>
+        </div>
+
+        <!-- Live Waveform -->
+        <div class="waveform" id="waveform"></div>
+
+        <!-- Bottom Actions Dock -->
+        <div class="bottom-dock">
+            <div class="dock-btn" onclick="sendAction('pavucontrol')">🎛️ Mixer</div>
+            <div class="dock-btn" onclick="sendAction('close')">✕ Close</div>
+        </div>
+    </div>
+
+    <script>
+        function sendAction(action, payload) {
+            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.actionHandler) {
+                const msg = payload !== undefined ? `${action}:${payload}` : action;
+                window.webkit.messageHandlers.actionHandler.postMessage(msg);
+            }
+        }
+
+        function onMasterVolChange(val) {
+            document.getElementById('master-vol-badge').innerText = val + '%';
+            sendAction('set_master_volume', val);
+        }
+
+        function onMicVolChange(val) {
+            document.getElementById('mic-val').innerText = val + '%';
+            sendAction('set_mic_volume', val);
+        }
+
+        function onAppVolChange(id, val) {
+            sendAction('set_app_volume', `${id}:${val}`);
+        }
+
+        function toggleAppMute(id) {
+            sendAction('toggle_app_mute', id);
+        }
+
+        function switchSink(id) {
+            sendAction('switch_sink', id);
+        }
+
+        // Init wave bars
+        const waveContainer = document.getElementById('waveform');
+        for (let i = 0; i < 30; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'wave-bar';
+            bar.style.height = (Math.random() * 16 + 2) + 'px';
+            waveContainer.appendChild(bar);
+        }
+
+        window.updateStats = function(data) {
+            if (!data) return;
+
+            // Master Volume
+            if (data.master) {
+                const vol = data.master.volume || 0;
+                document.getElementById('master-vol-badge').innerText = vol + '%';
+                if (!document.getElementById('master-slider').matches(':active')) {
+                    document.getElementById('master-slider').value = vol;
+                }
+                const muteBtn = document.getElementById('btn-master-mute');
+                if (data.master.muted) {
+                    muteBtn.classList.add('muted');
+                    muteBtn.innerText = 'Unmute';
+                } else {
+                    muteBtn.classList.remove('muted');
+                    muteBtn.innerText = 'Mute';
+                }
+            }
+
+            // Microphone
+            if (data.mic) {
+                const mvol = data.mic.volume || 0;
+                document.getElementById('mic-val').innerText = mvol + '%';
+                if (!document.getElementById('mic-slider').matches(':active')) {
+                    document.getElementById('mic-slider').value = mvol;
+                }
+                const micMuteBtn = document.getElementById('btn-mic-mute');
+                if (data.mic.muted) {
+                    micMuteBtn.classList.add('muted');
+                    micMuteBtn.innerText = 'Unmute';
+                } else {
+                    micMuteBtn.classList.remove('muted');
+                    micMuteBtn.innerText = 'Mute';
+                }
+            }
+
+            // Sinks / Output Devices List
+            if (data.sinks && data.sinks.length > 0) {
+                let html = '';
+                data.sinks.forEach(sink => {
+                    let icon = '🔊';
+                    const lower = sink.name.toLowerCase();
+                    if (lower.includes('headset') || lower.includes('headphone')) icon = '🎧';
+                    else if (lower.includes('hdmi') || lower.includes('displayport')) icon = '📺';
+                    else if (lower.includes('speaker')) icon = '🔊';
+
+                    html += `
+                        <div class="device-item ${sink.is_default ? 'active' : ''}" onclick="switchSink('${sink.id}')">
+                            <div class="dev-left">
+                                <span>${icon}</span>
+                                <span>${sink.name}</span>
+                            </div>
+                            ${sink.is_default ? '<span class="check-dot">✓</span>' : ''}
+                        </div>
+                    `;
+                });
+                document.getElementById('sinks-list').innerHTML = html;
+            }
+
+            // App Voices Streams List
+            if (data.apps && data.apps.length > 0) {
+                let html = '';
+                data.apps.forEach(app => {
+                    let icon = '🎵';
+                    const lower = app.name.toLowerCase();
+                    if (lower.includes('firefox') || lower.includes('chrome')) icon = '🌐';
+                    else if (lower.includes('obs')) icon = '📹';
+                    else if (lower.includes('spotify') || lower.includes('music')) icon = '🎧';
+                    else if (lower.includes('discord')) icon = '💬';
+
+                    html += `
+                        <div class="app-item">
+                            <div class="app-header">
+                                <span class="app-title"><span>${icon}</span> ${app.name}</span>
+                                <span style="font-size:9.5px; opacity:0.8;">${app.volume}%</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <input type="range" class="custom-range" min="0" max="100" value="${app.volume}" oninput="onAppVolChange('${app.id}', this.value)">
+                                <button class="vol-btn-mute ${app.muted ? 'muted' : ''}" style="font-size:9px; padding:1px 5px;" onclick="toggleAppMute('${app.id}')">${app.muted ? '🔇' : '🔊'}</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                document.getElementById('apps-list').innerHTML = html;
+            } else {
+                document.getElementById('apps-list').innerHTML = '<div style="text-align:center; padding:6px; font-size:10.5px; color:rgba(255,255,255,0.5);">No active audio streams</div>';
+            }
+        };
+    </script>
+</body>
+</html>

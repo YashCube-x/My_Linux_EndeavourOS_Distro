@@ -449,6 +449,19 @@ hl.window_rule({
 })
 
 hl.window_rule({
+    -- macOS Sound & App Voice Manager Popup
+    name  = "istat-popup-sound",
+    match = { title = "^(iStat Menus - Sound)$" },
+
+    float       = true,
+    pin         = true,
+    border_size = 0,
+    size        = { 320, 480 },
+    move        = { 1420, 34 },
+    animation   = "slide top",
+})
+
+hl.window_rule({
     -- macOS Wi-Fi Manager Popup
     name  = "istat-popup-wifi",
     match = { title = "^(iStat Menus - WiFi)$" },

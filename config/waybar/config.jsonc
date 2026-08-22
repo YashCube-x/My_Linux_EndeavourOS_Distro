@@ -90,7 +90,7 @@
             "default": ["", "", ""]
         },
         "scroll-step": 5,
-        "on-click": "pavucontrol",
+        "on-click": "/home/suyash/.config/waybar/scripts/sound_popup.py",
         "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
         "tooltip": false
     },
