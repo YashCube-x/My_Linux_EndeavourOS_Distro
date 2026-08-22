@@ -83,17 +83,15 @@ window#waybar {
 #custom-notification,
 #clock,
 #custom-power {
-    background-color: transparent;
-    color: rgba(255, 255, 255, 0.85);
+    background-color: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.90);
     border-radius: 6px;
-    padding: 0 7px;
-    margin: 3px 1px;
+    padding: 0 8px;
+    margin: 3px 2.5px;
     transition: all 0.2s ease-in-out;
 }
 
-#memory:hover,
-#cpu:hover,
-#disk:hover,
+#custom-system_stats:hover,
 #custom-tablet:hover,
 #backlight:hover,
 #custom-wifi:hover,
@@ -103,14 +101,14 @@ window#waybar {
 #custom-notification:hover,
 #clock:hover,
 #custom-power:hover {
-    background-color: rgba(255, 255, 255, 0.13);
+    background-color: rgba(255, 255, 255, 0.18);
     color: #ffffff;
 }
 
 /* Tablet Toggle Styling */
 #custom-tablet.connected {
     color: #a6e3a1;
-    background-color: rgba(166, 227, 161, 0.18);
+    background-color: rgba(166, 227, 161, 0.14);
 }
 
 #custom-tablet.disconnected {
