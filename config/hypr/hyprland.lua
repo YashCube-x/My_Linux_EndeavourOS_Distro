@@ -449,15 +449,53 @@ hl.window_rule({
 })
 
 hl.window_rule({
-    -- macOS iStat Menus System Widget Popup (Slides down right under RAM/CPU)
-    name  = "istat-popup-window",
-    match = { title = "^(iStat Menus)$" },
+    -- macOS iStat Menus System Widget Popup - RAM
+    name  = "istat-popup-ram",
+    match = { title = "^(iStat Menus - RAM)$" },
 
     float       = true,
     pin         = true,
     border_size = 0,
-    size        = { 330, 500 },
-    move        = { 1120, 34 },
+    size        = { 330, 495 },
+    move        = { 1080, 34 },
+    animation   = "slide top",
+})
+
+hl.window_rule({
+    -- macOS iStat Menus System Widget Popup - CPU
+    name  = "istat-popup-cpu",
+    match = { title = "^(iStat Menus - CPU)$" },
+
+    float       = true,
+    pin         = true,
+    border_size = 0,
+    size        = { 330, 495 },
+    move        = { 1140, 34 },
+    animation   = "slide top",
+})
+
+hl.window_rule({
+    -- macOS iStat Menus System Widget Popup - SSD
+    name  = "istat-popup-ssd",
+    match = { title = "^(iStat Menus - SSD)$" },
+
+    float       = true,
+    pin         = true,
+    border_size = 0,
+    size        = { 330, 495 },
+    move        = { 1200, 34 },
+    animation   = "slide top",
+})
+
+hl.window_rule({
+    -- Fallback rule
+    name  = "istat-popup-generic",
+    match = { title = "^(iStat Menus.*)$" },
+
+    float       = true,
+    pin         = true,
+    border_size = 0,
+    size        = { 330, 495 },
     animation   = "slide top",
 })
 

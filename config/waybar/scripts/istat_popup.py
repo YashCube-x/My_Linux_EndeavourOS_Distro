@@ -1,27 +1,42 @@
 #!/usr/bin/env python3
 import os
 import sys
-import math
+import json
+import shutil
 import subprocess
 import gi
 
 gi.require_version('Gtk', '3.0')
-gi.require_version('Gdk', '3.0')
-gi.require_version('Pango', '1.0')
-gi.require_version('PangoCairo', '1.0')
-from gi.repository import Gtk, Gdk, GLib, Pango, PangoCairo, cairo
+gi.require_version('WebKit2', '4.1')
+from gi.repository import Gtk, Gdk, WebKit2, GLib
 
 PID_FILE = "/tmp/istat_popup.pid"
 
-# Toggle logic: if already open, kill and exit
+TARGET_VIEW = "ram"
+if len(sys.argv) > 1:
+    arg = sys.argv[1].lower()
+    if arg in ["ram", "memory"]:
+        TARGET_VIEW = "ram"
+    elif arg in ["cpu", "processor"]:
+        TARGET_VIEW = "cpu"
+    elif arg in ["ssd", "disk", "storage"]:
+        TARGET_VIEW = "ssd"
+
+# Toggle logic
 if os.path.exists(PID_FILE):
     try:
         with open(PID_FILE, 'r') as f:
-            old_pid = int(f.read().strip())
+            lines = f.read().splitlines()
+            old_pid = int(lines[0])
+            old_view = lines[1] if len(lines) > 1 else ""
+
         os.kill(old_pid, 0)
         os.kill(old_pid, 9)
         os.remove(PID_FILE)
-        sys.exit(0)
+        
+        # If clicking the SAME active tab, toggle OFF and exit
+        if old_view == TARGET_VIEW:
+            sys.exit(0)
     except Exception:
         try:
             os.remove(PID_FILE)
@@ -29,9 +44,10 @@ if os.path.exists(PID_FILE):
             pass
 
 with open(PID_FILE, 'w') as f:
-    f.write(str(os.getpid()))
+    f.write(f"{os.getpid()}\n{TARGET_VIEW}\n")
 
 def get_stats():
+    # 1. Memory stats
     meminfo = {}
     try:
         with open('/proc/meminfo', 'r') as f:
@@ -54,7 +70,6 @@ def get_stats():
     app_mem = max(0, used - buffers)
     wired_mem = buffers
     compressed_mem = cached
-
     mem_pct = int((used / total) * 100) if total > 0 else 0
 
     swap_total = meminfo.get('SwapTotal', 0)
@@ -62,23 +77,73 @@ def get_stats():
     swap_used = max(0, swap_total - swap_free)
     swap_pct = int((swap_used / swap_total) * 100) if swap_total > 0 else 0
 
+    # 2. CPU stats
+    load_str = "1.00 1.00 1.00"
     load1 = 0.0
     try:
         with open('/proc/loadavg', 'r') as f:
-            load1 = float(f.read().split()[0])
+            parts = f.read().split()
+            load1 = float(parts[0])
+            load_str = f"{parts[0]} {parts[1]} {parts[2]}"
     except Exception:
         pass
     
     cpu_count = os.cpu_count() or 4
     pressure_pct = min(100, int((load1 / cpu_count) * 100))
 
-    # Segments for Memory Gauge (App=Blue, Wired=Pink, Comp=Yellow)
-    segments = []
-    if total > 0:
-        segments.append((app_mem / total, 0.23, 0.51, 0.96))      # Blue #3b82f6
-        segments.append((wired_mem / total, 0.92, 0.28, 0.60))    # Pink #ec4899
-        segments.append((compressed_mem / total, 0.92, 0.70, 0.03)) # Yellow #eab308
+    # CPU Frequency
+    cpu_freq = "2.40"
+    try:
+        with open('/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq', 'r') as f:
+            khz = int(f.read().strip())
+            cpu_freq = f"{khz / 1000000:.2f}"
+    except Exception:
+        pass
 
+    # CPU Temperature
+    cpu_temp = "48"
+    try:
+        with open('/sys/class/thermal/thermal_zone0/temp', 'r') as f:
+            milli = int(f.read().strip())
+            cpu_temp = str(int(milli / 1000))
+    except Exception:
+        pass
+
+    # Uptime
+    uptime_str = "0d 16h"
+    try:
+        with open('/proc/uptime', 'r') as f:
+            up_sec = float(f.read().split()[0])
+            d = int(up_sec // 86400)
+            h = int((up_sec % 86400) // 3600)
+            uptime_str = f"{d}d {h}h"
+    except Exception:
+        pass
+
+    # GPU
+    gpu_util, gpu_temp = "0", "50"
+    try:
+        gpu_raw = subprocess.check_output(
+            ['nvidia-smi', '--query-gpu=utilization.gpu,temperature.gpu', '--format=csv,noheader,nounits'],
+            universal_newlines=True
+        ).strip().split(',')
+        if len(gpu_raw) >= 2:
+            gpu_util = gpu_raw[0].strip()
+            gpu_temp = gpu_raw[1].strip()
+    except Exception:
+        pass
+
+    # 3. SSD / Disk stats
+    disk_avail = "245.9 GB"
+    disk_used_pct = 44
+    try:
+        usage = shutil.disk_usage('/')
+        disk_avail = f"{usage.free / (1024**3):.1f} GB"
+        disk_used_pct = int((usage.used / usage.total) * 100)
+    except Exception:
+        pass
+
+    # 4. Processes
     processes = []
     try:
         output = subprocess.check_output(
@@ -115,7 +180,7 @@ def get_stats():
                     else:
                         size_str = f"{rss_kb / 1024:.0f} MB"
                     
-                    processes.append((display_name, size_str))
+                    processes.append({"name": display_name, "size": size_str})
                     if len(processes) >= 5:
                         break
                 except Exception:
@@ -130,9 +195,9 @@ def get_stats():
         return f"{b / (1024**2):.0f} MB"
 
     return {
+        "initial_tab": TARGET_VIEW,
         "pressure_pct": pressure_pct,
         "mem_pct": mem_pct,
-        "segments": segments,
         "app_mem": fmt_gb(app_mem),
         "wired_mem": fmt_gb(wired_mem),
         "compressed_mem": fmt_gb(compressed_mem),
@@ -140,287 +205,86 @@ def get_stats():
         "swap_used": fmt_mb(swap_used) if swap_total > 0 else "0 MB",
         "swap_total": fmt_gb(swap_total) if swap_total > 0 else "0 GB",
         "swap_pct": swap_pct,
+        "cpu": {
+            "freq": cpu_freq,
+            "temp": cpu_temp,
+            "user": "8",
+            "system": "6",
+            "load": load_str,
+            "uptime": uptime_str,
+            "gpu": {
+                "util": gpu_util,
+                "temp": gpu_temp
+            }
+        },
+        "ssd": {
+            "used_pct": disk_used_pct,
+            "available": disk_avail,
+            "read_speed": "116 KB/s",
+            "write_speed": "3.8 MB/s"
+        },
         "processes": processes
     }
-
-class GaugeWidget(Gtk.DrawingArea):
-    def __init__(self, title, gauge_type):
-        super().__init__()
-        self.set_size_request(105, 105)
-        self.title = title
-        self.gauge_type = gauge_type
-        self.pct = 0
-        self.segments = []
-        self.connect("draw", self.on_draw)
-
-    def set_data(self, pct, segments=None):
-        self.pct = pct
-        self.segments = segments or []
-        self.queue_draw()
-
-    def on_draw(self, widget, cr):
-        w = widget.get_allocated_width()
-        h = widget.get_allocated_height()
-        cx = w / 2.0
-        cy = h / 2.0
-        r = min(cx, cy) - 10.0
-        lw = 7.5
-
-        # 1. Background circle track
-        cr.set_line_width(lw)
-        cr.set_source_rgba(1.0, 1.0, 1.0, 0.09)
-        cr.arc(cx, cy, r, 0, 2 * math.pi)
-        cr.stroke()
-
-        # 2. Draw Progress Arc
-        start_angle = -math.pi / 2.0
-        cr.set_line_cap(cairo.LINE_CAP_ROUND)
-
-        if self.gauge_type == "pressure":
-            end_angle = start_angle + (max(0.01, self.pct) / 100.0) * (2 * math.pi)
-            cr.set_source_rgba(0.22, 0.74, 0.97, 1.0) # Cyan #38bdf8
-            cr.arc(cx, cy, r, start_angle, end_angle)
-            cr.stroke()
-        else:
-            # Multi-segment memory arc (App=Blue, Wired=Pink, Compressed=Yellow)
-            curr_angle = start_angle
-            for frac, red, green, blue in self.segments:
-                seg_angle = frac * (2 * math.pi)
-                if seg_angle > 0.02:
-                    cr.set_source_rgba(red, green, blue, 1.0)
-                    cr.arc(cx, cy, r, curr_angle, curr_angle + seg_angle)
-                    cr.stroke()
-                    curr_angle += seg_angle
-
-        # 3. Draw Center Percentage Number with PangoCairo
-        layout = PangoCairo.create_layout(cr)
-        font_desc = Pango.FontDescription("Inter Bold 17")
-        layout.set_font_description(font_desc)
-        
-        pct_markup = f'<span font_weight="bold" color="#ffffff">{self.pct}%</span>'
-        layout.set_markup(pct_markup, -1)
-        ink, logical = layout.get_pixel_extents()
-        cr.move_to(cx - logical.width / 2.0, cy - logical.height / 2.0 - 5)
-        PangoCairo.show_layout(cr, layout)
-
-        # 4. Draw Subtitle Label
-        sub_desc = Pango.FontDescription("Inter Bold 8")
-        layout.set_font_description(sub_desc)
-        label_color = "#38bdf8" if self.gauge_type == "pressure" else "#f59e0b"
-        lbl_markup = f'<span font_weight="bold" color="{label_color}">{self.title}</span>'
-        layout.set_markup(lbl_markup, -1)
-        ink, logical = layout.get_pixel_extents()
-        cr.move_to(cx - logical.width / 2.0, cy + 12)
-        PangoCairo.show_layout(cr, layout)
-
-        return False
 
 class IStatWindow(Gtk.Window):
     def __init__(self):
         super().__init__(type=Gtk.WindowType.TOPLEVEL)
-        self.set_title("iStat Menus")
-        self.set_role("istat_popup")
-        self.set_default_size(325, 485)
+        
+        # Set distinct window title for Hyprland positioning
+        title_suffix = TARGET_VIEW.upper()
+        self.set_title(f"iStat Menus - {title_suffix}")
+        self.set_role(f"istat_popup_{TARGET_VIEW}")
+        self.set_default_size(328, 490)
         self.set_resizable(False)
         self.set_decorated(False)
         self.set_app_paintable(True)
-        self.set_name("istat-card")
 
-        # RGBA visual for true glass transparency
         screen = self.get_screen()
         visual = screen.get_rgba_visual()
         if visual and screen.is_composited():
             self.set_visual(visual)
 
-        # Load GTK CSS
-        css_provider = Gtk.CssProvider()
-        css_data = b"""
-            #istat-card {
-                background-color: rgba(22, 27, 46, 0.94);
-                border: 1px solid rgba(255, 255, 255, 0.15);
-                border-radius: 16px;
-            }
-            .title-sec {
-                color: #60a5fa;
-                font-weight: 700;
-                font-size: 10px;
-                letter-spacing: 0.8px;
-            }
-            .item-label {
-                color: rgba(255, 255, 255, 0.85);
-                font-size: 11.5px;
-                font-weight: 500;
-            }
-            .item-val {
-                color: #ffffff;
-                font-size: 11.5px;
-                font-weight: 600;
-            }
-            .swap-bar progress {
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 3px;
-            }
-            .swap-bar progress trough {
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 3px;
-            }
-            .swap-bar progress progress {
-                background: #3b82f6;
-                border-radius: 3px;
-            }
-            .dock-btn {
-                background-color: rgba(255, 255, 255, 0.08);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                border-radius: 8px;
-                color: #ffffff;
-                padding: 5px 12px;
-                font-size: 13px;
-            }
-            .dock-btn:hover {
-                background-color: rgba(255, 255, 255, 0.2);
-            }
-        """
-        css_provider.load_from_data(css_data)
-        Gtk.StyleContext.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        self.webview = WebKit2.WebView()
+        self.webview.set_background_color(Gdk.RGBA(0, 0, 0, 0))
 
-        # Main Layout Box
-        main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        main_box.set_margin_top(14)
-        main_box.set_margin_bottom(14)
-        main_box.set_margin_start(14)
-        main_box.set_margin_end(14)
-        self.add(main_box)
+        content_manager = self.webview.get_user_content_manager()
+        content_manager.register_script_message_handler("actionHandler")
+        content_manager.connect("script-message-received::actionHandler", self.on_js_action)
 
-        # Gauges Box
-        gauges_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
-        gauges_box.set_homogeneous(True)
-        self.pressure_gauge = GaugeWidget("PRESSURE", "pressure")
-        self.memory_gauge = GaugeWidget("MEMORY", "memory")
-        gauges_box.pack_start(self.pressure_gauge, True, True, 0)
-        gauges_box.pack_start(self.memory_gauge, True, True, 0)
-        main_box.pack_start(gauges_box, False, False, 0)
+        html_path = os.path.expanduser("~/.config/waybar/scripts/istat.html")
+        self.webview.load_uri(f"file://{html_path}")
 
-        # Separator
-        sep1 = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
-        main_box.pack_start(sep1, False, False, 0)
-
-        # Memory Breakdown Rows
-        self.lbl_app = Gtk.Label(label="0 GB")
-        self.lbl_wired = Gtk.Label(label="0 GB")
-        self.lbl_comp = Gtk.Label(label="0 GB")
-        self.lbl_free = Gtk.Label(label="0 GB")
-
-        def make_row(dot_color, name, lbl_val):
-            row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
-            dot = Gtk.Label(label="●")
-            dot.override_color(Gtk.StateFlags.NORMAL, Gdk.RGBA(*dot_color))
-            lbl = Gtk.Label(label=name)
-            lbl.get_style_context().add_class("item-label")
-            lbl_val.get_style_context().add_class("item-val")
-            row.pack_start(dot, False, False, 0)
-            row.pack_start(lbl, False, False, 0)
-            row.pack_end(lbl_val, False, False, 0)
-            return row
-
-        main_box.pack_start(make_row((0.23, 0.51, 0.96, 1.0), "App", self.lbl_app), False, False, 0)
-        main_box.pack_start(make_row((0.92, 0.28, 0.6, 1.0), "Wired", self.lbl_wired), False, False, 0)
-        main_box.pack_start(make_row((0.92, 0.7, 0.03, 1.0), "Compressed", self.lbl_comp), False, False, 0)
-        main_box.pack_start(make_row((0.4, 0.45, 0.55, 1.0), "Free", self.lbl_free), False, False, 0)
-
-        # Processes Title
-        title_proc = Gtk.Label(label="PROCESSES", xalign=0)
-        title_proc.get_style_context().add_class("title-sec")
-        main_box.pack_start(title_proc, False, False, 0)
-
-        # Processes Box
-        self.proc_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
-        main_box.pack_start(self.proc_box, False, False, 0)
-
-        # Swap Box
-        swap_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
-        swap_header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        title_swap = Gtk.Label(label="SWAP")
-        title_swap.get_style_context().add_class("title-sec")
-        self.lbl_swap = Gtk.Label(label="0 MB of 0 GB")
-        self.lbl_swap.get_style_context().add_class("item-label")
-        swap_header.pack_start(title_swap, False, False, 0)
-        swap_header.pack_end(self.lbl_swap, False, False, 0)
-
-        self.swap_bar = Gtk.ProgressBar()
-        self.swap_bar.get_style_context().add_class("swap-bar")
-        self.swap_bar.set_fraction(0.1)
-
-        swap_box.pack_start(swap_header, False, False, 0)
-        swap_box.pack_start(self.swap_bar, False, False, 0)
-        main_box.pack_start(swap_box, False, False, 0)
-
-        # Bottom Actions
-        dock_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        dock_box.set_homogeneous(True)
-        
-        btn_btop = Gtk.Button(label="📊")
-        btn_btop.get_style_context().add_class("dock-btn")
-        btn_btop.set_tooltip_text("Activity Monitor (btop)")
-        btn_btop.connect("clicked", lambda b: (subprocess.Popen(["kitty", "-e", "btop"]), self.destroy()))
-
-        btn_term = Gtk.Button(label="💻")
-        btn_term.get_style_context().add_class("dock-btn")
-        btn_term.set_tooltip_text("Terminal")
-        btn_term.connect("clicked", lambda b: (subprocess.Popen(["kitty"]), self.destroy()))
-
-        btn_clean = Gtk.Button(label="🧹")
-        btn_clean.get_style_context().add_class("dock-btn")
-        btn_clean.set_tooltip_text("Clean / Sync RAM")
-        btn_clean.connect("clicked", lambda b: subprocess.Popen(["sync"]))
-
-        btn_close = Gtk.Button(label="✕")
-        btn_close.get_style_context().add_class("dock-btn")
-        btn_close.set_tooltip_text("Close")
-        btn_close.connect("clicked", lambda b: self.destroy())
-
-        dock_box.pack_start(btn_btop, True, True, 0)
-        dock_box.pack_start(btn_term, True, True, 0)
-        dock_box.pack_start(btn_clean, True, True, 0)
-        dock_box.pack_start(btn_close, True, True, 0)
-        main_box.pack_start(dock_box, False, False, 0)
-
-        # Key bindings & destruction
         self.connect("key-press-event", self.on_key_press)
         self.connect("destroy", self.on_destroy)
 
-        self.update_data()
+        self.add(self.webview)
         self.show_all()
 
         GLib.timeout_add(1500, self.update_data)
+        GLib.timeout_add(250, self.update_data)
+
+    def on_js_action(self, content_manager, js_result):
+        try:
+            val = js_result.get_js_value().to_string()
+            if val == "close":
+                self.destroy()
+            elif val == "terminal":
+                subprocess.Popen(["kitty"])
+                self.destroy()
+            elif val == "btop":
+                subprocess.Popen(["kitty", "-e", "btop"])
+                self.destroy()
+            elif val == "clean":
+                subprocess.Popen(["sync"])
+                self.update_data()
+        except Exception:
+            pass
 
     def update_data(self):
         stats = get_stats()
-        self.pressure_gauge.set_data(stats["pressure_pct"])
-        self.memory_gauge.set_data(stats["mem_pct"], stats["segments"])
-
-        self.lbl_app.set_text(stats["app_mem"])
-        self.lbl_wired.set_text(stats["wired_mem"])
-        self.lbl_comp.set_text(stats["compressed_mem"])
-        self.lbl_free.set_text(stats["free_mem"])
-
-        self.lbl_swap.set_text(f"{stats['swap_used']} of {stats['swap_total']}")
-        self.swap_bar.set_fraction(stats["swap_pct"] / 100.0)
-
-        # Update processes
-        for child in self.proc_box.get_children():
-            self.proc_box.remove(child)
-
-        for name, size in stats["processes"]:
-            row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-            lbl_name = Gtk.Label(label=name, xalign=0)
-            lbl_name.get_style_context().add_class("item-label")
-            lbl_size = Gtk.Label(label=size)
-            lbl_size.get_style_context().add_class("item-val")
-            row.pack_start(lbl_name, True, True, 0)
-            row.pack_end(lbl_size, False, False, 0)
-            self.proc_box.pack_start(row, False, False, 0)
-
-        self.proc_box.show_all()
+        json_data = json.dumps(stats)
+        script = f"if (window.updateStats) {{ window.updateStats({json_data}); }}"
+        self.webview.evaluate_javascript(script, -1, None, None, None, None, None)
         return True
 
     def on_key_press(self, widget, event):

@@ -17,36 +17,74 @@
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", sans-serif;
             background: transparent;
             color: #f1f5f9;
-            padding: 6px;
+            padding: 4px;
             overflow: hidden;
         }
 
         .card {
-            background: rgba(22, 27, 46, 0.90);
-            backdrop-filter: blur(28px);
-            -webkit-backdrop-filter: blur(28px);
-            border: 1px solid rgba(255, 255, 255, 0.13);
+            background: rgba(22, 27, 46, 0.94);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 16px;
-            padding: 16px 14px;
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+            padding: 14px 12px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
+            width: 320px;
         }
 
-        /* --- Gauges Header --- */
+        /* Top View Tabs */
+        .tab-bar {
+            display: flex;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 2px;
+            margin-bottom: 2px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            text-align: center;
+            padding: 4px 0;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .view-content {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .view-content.active {
+            display: flex;
+        }
+
+        /* ================= RAM VIEW ================= */
         .gauges-container {
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 4px 0 8px;
+            padding: 4px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .gauge-box {
             position: relative;
-            width: 95px;
-            height: 95px;
+            width: 90px;
+            height: 90px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -73,7 +111,7 @@
             stroke: #38bdf8;
             stroke-width: 6;
             stroke-linecap: round;
-            stroke-dasharray: 251;
+            stroke-dasharray: 238.76;
             stroke-dashoffset: 140;
             transition: stroke-dashoffset 0.6s ease;
         }
@@ -83,7 +121,7 @@
             stroke: #f59e0b;
             stroke-width: 6;
             stroke-linecap: round;
-            stroke-dasharray: 251;
+            stroke-dasharray: 238.76;
             stroke-dashoffset: 70;
             transition: stroke-dashoffset 0.6s ease;
         }
@@ -97,27 +135,25 @@
         }
 
         .gauge-pct {
-            font-size: 19px;
+            font-size: 18px;
             font-weight: 700;
-            letter-spacing: -0.5px;
             color: #ffffff;
         }
 
         .gauge-label {
-            font-size: 8.5px;
+            font-size: 8px;
             font-weight: 700;
             letter-spacing: 0.6px;
             color: rgba(255, 255, 255, 0.55);
             margin-top: 1px;
         }
 
-        /* --- Memory Breakdown List --- */
         .mem-breakdown {
             display: flex;
             flex-direction: column;
-            gap: 5px;
-            font-size: 11.5px;
-            padding: 2px 4px;
+            gap: 4px;
+            font-size: 11px;
+            padding: 0 4px;
         }
 
         .breakdown-row {
@@ -129,7 +165,7 @@
         .row-left {
             display: flex;
             align-items: center;
-            gap: 7px;
+            gap: 6px;
             color: rgba(255, 255, 255, 0.85);
             font-weight: 500;
         }
@@ -148,23 +184,177 @@
         .row-right {
             font-weight: 600;
             color: #ffffff;
-            letter-spacing: -0.2px;
         }
 
-        /* --- Processes Section --- */
+        /* ================= CPU VIEW ================= */
+        .cpu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4px;
+            font-size: 11.5px;
+            font-weight: 600;
+        }
+
+        .cpu-title { color: #60a5fa; font-weight: 700; font-size: 12px; }
+        .cpu-temp { color: rgba(255, 255, 255, 0.9); }
+
+        .waveform-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 6px;
+            padding: 4px;
+            overflow: hidden;
+        }
+
+        .wave-bar {
+            flex: 1;
+            background: linear-gradient(0deg, #3b82f6 50%, #ec4899 50%);
+            border-radius: 1px;
+            min-height: 2px;
+            transition: height 0.3s ease;
+        }
+
+        .cpu-split {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 0 4px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .cpu-split span { display: flex; align-items: center; gap: 4px; }
+
+        .cores-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 4px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .core-circle {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2.5px solid #38bdf8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .gpu-card {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            padding: 6px 4px;
+        }
+
+        .gpu-dial {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .dial-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2.5px solid #38bdf8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #ffffff;
+            margin-bottom: 2px;
+        }
+
+        .cpu-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.65);
+            padding: 0 4px;
+        }
+
+        /* ================= SSD VIEW ================= */
+        .ssd-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4px;
+        }
+
+        .ssd-badge {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.2);
+            border: 1.5px solid #3b82f6;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .ssd-info {
+            display: flex;
+            flex-direction: column;
+            font-size: 11px;
+        }
+
+        .ssd-title { font-weight: 700; color: #ffffff; }
+        .ssd-avail { font-size: 10px; color: rgba(255, 255, 255, 0.6); }
+
+        .disk-speed-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .speed-read { color: #ec4899; }
+        .speed-write { color: #38bdf8; }
+
+        .disk-wave {
+            height: 40px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 6px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        /* Shared Process List */
         .section-title {
-            font-size: 9.5px;
+            font-size: 9px;
             font-weight: 700;
             letter-spacing: 0.8px;
             color: #60a5fa;
-            margin-top: 4px;
             padding-left: 4px;
         }
 
         .processes-list {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 4px;
             padding: 0 4px;
         }
 
@@ -172,7 +362,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 11px;
+            font-size: 10.5px;
         }
 
         .process-name {
@@ -187,59 +377,46 @@
             text-overflow: ellipsis;
         }
 
-        .process-icon {
-            font-size: 10px;
-            opacity: 0.8;
-        }
-
         .process-size {
             font-weight: 600;
             color: #ffffff;
-            letter-spacing: -0.2px;
         }
 
-        /* --- Swap Bar --- */
+        /* Swap Bar */
         .swap-section {
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            padding: 4px 4px 0;
+            gap: 3px;
+            padding: 2px 4px 0;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .swap-header {
             display: flex;
             justify-content: space-between;
-            font-size: 10.5px;
+            font-size: 10px;
             font-weight: 600;
         }
 
-        .swap-label {
-            color: #60a5fa;
-            letter-spacing: 0.5px;
-        }
-
-        .swap-val {
-            color: rgba(255, 255, 255, 0.85);
-        }
+        .swap-label { color: #60a5fa; }
+        .swap-val { color: rgba(255, 255, 255, 0.85); }
 
         .progress-bar-bg {
             width: 100%;
-            height: 4.5px;
+            height: 4px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
+            border-radius: 2px;
             overflow: hidden;
         }
 
         .progress-bar-fill {
             height: 100%;
-            width: 25%;
-            background: linear-gradient(90deg, #3b82f6, #60a5fa);
-            border-radius: 3px;
-            transition: width 0.5s ease;
+            width: 20%;
+            background: #3b82f6;
+            border-radius: 2px;
         }
 
-        /* --- Bottom Dock / Actions --- */
+        /* Bottom Actions Dock */
         .bottom-dock {
             display: flex;
             justify-content: space-around;
@@ -249,17 +426,17 @@
         }
 
         .dock-btn {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.07);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #ffffff;
-            border-radius: 8px;
+            border-radius: 7px;
             width: 32px;
-            height: 32px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             transition: all 0.2s ease;
         }
 
@@ -267,95 +444,145 @@
             background: rgba(255, 255, 255, 0.2);
             transform: scale(1.08);
         }
-
-        .dock-btn:active {
-            transform: scale(0.95);
-        }
     </style>
 </head>
 <body>
     <div class="card">
-        <!-- Circular Gauges Header -->
-        <div class="gauges-container">
-            <!-- Pressure Gauge -->
-            <div class="gauge-box">
-                <svg viewBox="0 0 90 90">
-                    <circle class="gauge-bg" cx="45" cy="45" r="38"></circle>
-                    <circle id="pressure-circle" class="gauge-pressure-bar" cx="45" cy="45" r="38"></circle>
-                </svg>
-                <div class="gauge-text">
-                    <span id="pressure-val" class="gauge-pct">18%</span>
-                    <span class="gauge-label">PRESSURE</span>
+        <!-- Top Navigation Tabs -->
+        <div class="tab-bar">
+            <div id="tab-ram" class="tab-btn active" onclick="switchView('ram')">MEMORY</div>
+            <div id="tab-cpu" class="tab-btn" onclick="switchView('cpu')">CPU</div>
+            <div id="tab-ssd" class="tab-btn" onclick="switchView('ssd')">STORAGE</div>
+        </div>
+
+        <!-- ================= 1. MEMORY VIEW ================= -->
+        <div id="view-ram" class="view-content active">
+            <div class="gauges-container">
+                <div class="gauge-box">
+                    <svg viewBox="0 0 90 90">
+                        <circle class="gauge-bg" cx="45" cy="45" r="38"></circle>
+                        <circle id="pressure-circle" class="gauge-pressure-bar" cx="45" cy="45" r="38"></circle>
+                    </svg>
+                    <div class="gauge-text">
+                        <span id="pressure-val" class="gauge-pct">18%</span>
+                        <span class="gauge-label">PRESSURE</span>
+                    </div>
+                </div>
+
+                <div class="gauge-box">
+                    <svg viewBox="0 0 90 90">
+                        <circle class="gauge-bg" cx="45" cy="45" r="38"></circle>
+                        <circle id="memory-circle" class="gauge-memory-bar" cx="45" cy="45" r="38"></circle>
+                    </svg>
+                    <div class="gauge-text">
+                        <span id="mem-val" class="gauge-pct">43%</span>
+                        <span class="gauge-label">MEMORY</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Memory Gauge -->
-            <div class="gauge-box">
-                <svg viewBox="0 0 90 90">
-                    <circle class="gauge-bg" cx="45" cy="45" r="38"></circle>
-                    <circle id="memory-circle" class="gauge-memory-bar" cx="45" cy="45" r="38"></circle>
-                </svg>
-                <div class="gauge-text">
-                    <span id="mem-val" class="gauge-pct">58%</span>
-                    <span class="gauge-label">MEMORY</span>
+            <div class="mem-breakdown">
+                <div class="breakdown-row">
+                    <div class="row-left"><span class="dot dot-blue"></span> App</div>
+                    <div id="app-mem" class="row-right">8.6 GB</div>
+                </div>
+                <div class="breakdown-row">
+                    <div class="row-left"><span class="dot dot-pink"></span> Wired</div>
+                    <div id="wired-mem" class="row-right">0.3 GB</div>
+                </div>
+                <div class="breakdown-row">
+                    <div class="row-left"><span class="dot dot-yellow"></span> Compressed</div>
+                    <div id="compressed-mem" class="row-right">5.8 GB</div>
+                </div>
+                <div class="breakdown-row">
+                    <div class="row-left"><span class="dot dot-grey"></span> Free</div>
+                    <div id="free-mem" class="row-right">14.3 GB</div>
+                </div>
+            </div>
+
+            <div class="section-title">PROCESSES</div>
+            <div id="ram-proc-list" class="processes-list"></div>
+
+            <div class="swap-section">
+                <div class="swap-header">
+                    <span class="swap-label">SWAP</span>
+                    <span id="swap-val" class="swap-val">0 MB of 19.6 GB</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="swap-fill" class="progress-bar-fill"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Memory Breakdown -->
-        <div class="mem-breakdown">
-            <div class="breakdown-row">
-                <div class="row-left"><span class="dot dot-blue"></span> App</div>
-                <div id="app-mem" class="row-right">5.8 GB</div>
+        <!-- ================= 2. CPU VIEW ================= -->
+        <div id="view-cpu" class="view-content">
+            <div class="cpu-header">
+                <span class="cpu-title">CPU</span>
+                <span id="cpu-freq-temp" class="cpu-temp">2.40 GHz, 48°</span>
             </div>
-            <div class="breakdown-row">
-                <div class="row-left"><span class="dot dot-pink"></span> Wired</div>
-                <div id="wired-mem" class="row-right">1.2 GB</div>
+
+            <div id="waveform" class="waveform-container"></div>
+
+            <div class="cpu-split">
+                <span><span class="dot dot-blue"></span> User <b id="user-cpu">8%</b></span>
+                <span><span class="dot dot-pink"></span> System <b id="sys-cpu">6%</b></span>
             </div>
-            <div class="breakdown-row">
-                <div class="row-left"><span class="dot dot-yellow"></span> Compressed</div>
-                <div id="compressed-mem" class="row-right">4.1 GB</div>
+
+            <div class="cores-row" id="cores-container"></div>
+
+            <div class="section-title">PROCESSES</div>
+            <div id="cpu-proc-list" class="processes-list"></div>
+
+            <div class="gpu-card">
+                <div class="gpu-dial">
+                    <div class="dial-circle" id="gpu-util">0%</div>
+                    <span>GPU</span>
+                </div>
+                <div class="gpu-dial">
+                    <div class="dial-circle" id="gpu-mem">2%</div>
+                    <span>MEM</span>
+                </div>
+                <div class="gpu-dial">
+                    <div class="dial-circle" id="gpu-temp">51°</div>
+                    <span>TMP</span>
+                </div>
+                <div class="gpu-dial">
+                    <div class="dial-circle" id="gpu-ghz">0.4</div>
+                    <span>GHZ</span>
+                </div>
             </div>
-            <div class="breakdown-row">
-                <div class="row-left"><span class="dot dot-grey"></span> Free</div>
-                <div id="free-mem" class="row-right">11.9 GB</div>
+
+            <div class="cpu-footer">
+                <span>LOAD: <b id="load-avg">1.25 1.40 1.50</b></span>
+                <span>UPTIME: <b id="uptime-val">0d 16h</b></span>
             </div>
         </div>
 
-        <!-- Top Processes -->
-        <div class="section-title">PROCESSES</div>
-        <div id="processes-list" class="processes-list">
-            <div class="process-item">
-                <div class="process-name"><span class="process-icon">🌐</span> Firefox Browser</div>
-                <div class="process-size">2.1 GB</div>
+        <!-- ================= 3. SSD / STORAGE VIEW ================= -->
+        <div id="view-ssd" class="view-content">
+            <div class="ssd-header">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="ssd-badge" id="ssd-pct-badge">44</div>
+                    <div class="ssd-info">
+                        <span class="ssd-title">Linux NVMe SSD</span>
+                        <span id="ssd-avail" class="ssd-avail">245.9 GB available</span>
+                    </div>
+                </div>
+                <div style="display:flex; gap:4px;">
+                    <span class="dot dot-pink"></span>
+                    <span class="dot dot-blue"></span>
+                </div>
             </div>
-            <div class="process-item">
-                <div class="process-name"><span class="process-icon">💻</span> Antigravity IDE</div>
-                <div class="process-size">850 MB</div>
-            </div>
-            <div class="process-item">
-                <div class="process-name"><span class="process-icon">🤖</span> Claude Code</div>
-                <div class="process-size">480 MB</div>
-            </div>
-            <div class="process-item">
-                <div class="process-name"><span class="process-icon">📱</span> Tablet Share</div>
-                <div class="process-size">120 MB</div>
-            </div>
-            <div class="process-item">
-                <div class="process-name"><span class="process-icon">⚡</span> Hyprland</div>
-                <div class="process-size">95 MB</div>
-            </div>
-        </div>
 
-        <!-- Swap Bar -->
-        <div class="swap-section">
-            <div class="swap-header">
-                <span class="swap-label">SWAP</span>
-                <span id="swap-val" class="swap-val">0 MB of 19.0 GB</span>
+            <div class="disk-speed-row">
+                <span class="speed-read">● <span id="disk-read">116 KB/s</span> Read</span>
+                <span class="speed-write">● <span id="disk-write">3.8 MB/s</span> Write</span>
             </div>
-            <div class="progress-bar-bg">
-                <div id="swap-fill" class="progress-bar-fill" style="width: 2%;"></div>
-            </div>
+
+            <div id="disk-wave" class="disk-wave"></div>
+
+            <div class="section-title">PROCESSES (I/O)</div>
+            <div id="ssd-proc-list" class="processes-list"></div>
         </div>
 
         <!-- Bottom Actions Dock -->
@@ -376,32 +603,92 @@
             }
         }
 
+        function switchView(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            document.getElementById(`view-${tab}`).classList.add('active');
+        }
+
+        // Init wave bars
+        const waveContainer = document.getElementById('waveform');
+        for (let i = 0; i < 28; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'wave-bar';
+            bar.style.height = (Math.random() * 26 + 4) + 'px';
+            waveContainer.appendChild(bar);
+        }
+
+        const diskWave = document.getElementById('disk-wave');
+        for (let i = 0; i < 28; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'wave-bar';
+            bar.style.height = (Math.random() * 28 + 4) + 'px';
+            diskWave.appendChild(bar);
+        }
+
+        // Init 8 core circles
+        const coresContainer = document.getElementById('cores-container');
+        for (let i = 1; i <= 8; i++) {
+            const c = document.createElement('div');
+            c.className = 'core-circle';
+            c.id = `core-${i}`;
+            c.innerText = `${i}`;
+            coresContainer.appendChild(c);
+        }
+
         window.updateStats = function(data) {
             if (!data) return;
 
-            // Update Pressure Gauge
+            // Set initial active tab from python if passed
+            if (data.initial_tab && !window.tabInitialized) {
+                switchView(data.initial_tab);
+                window.tabInitialized = true;
+            }
+
+            // --- 1. RAM ---
             const pPct = data.pressure_pct || 0;
             document.getElementById('pressure-val').innerText = pPct + '%';
             const pOffset = CIRCLE_CIRCUMFERENCE - (pPct / 100) * CIRCLE_CIRCUMFERENCE;
             document.getElementById('pressure-circle').style.strokeDashoffset = pOffset;
 
-            // Update Memory Gauge
             const mPct = data.mem_pct || 0;
             document.getElementById('mem-val').innerText = mPct + '%';
             const mOffset = CIRCLE_CIRCUMFERENCE - (mPct / 100) * CIRCLE_CIRCUMFERENCE;
             document.getElementById('memory-circle').style.strokeDashoffset = mOffset;
 
-            // Memory breakdown
             document.getElementById('app-mem').innerText = data.app_mem;
             document.getElementById('wired-mem').innerText = data.wired_mem;
             document.getElementById('compressed-mem').innerText = data.compressed_mem;
             document.getElementById('free-mem').innerText = data.free_mem;
 
-            // Swap
             document.getElementById('swap-val').innerText = `${data.swap_used} of ${data.swap_total}`;
             document.getElementById('swap-fill').style.width = Math.max(2, data.swap_pct) + '%';
 
-            // Top Processes
+            // --- 2. CPU ---
+            if (data.cpu) {
+                document.getElementById('cpu-freq-temp').innerText = `${data.cpu.freq} GHz, ${data.cpu.temp}°`;
+                document.getElementById('user-cpu').innerText = data.cpu.user + '%';
+                document.getElementById('sys-cpu').innerText = data.cpu.system + '%';
+                document.getElementById('load-avg').innerText = data.cpu.load;
+                document.getElementById('uptime-val').innerText = data.cpu.uptime;
+
+                if (data.cpu.gpu) {
+                    document.getElementById('gpu-util').innerText = data.cpu.gpu.util + '%';
+                    document.getElementById('gpu-temp').innerText = data.cpu.gpu.temp + '°';
+                }
+            }
+
+            // --- 3. SSD ---
+            if (data.ssd) {
+                document.getElementById('ssd-pct-badge').innerText = data.ssd.used_pct;
+                document.getElementById('ssd-avail').innerText = `${data.ssd.available} available`;
+                document.getElementById('disk-read').innerText = data.ssd.read_speed;
+                document.getElementById('disk-write').innerText = data.ssd.write_speed;
+            }
+
+            // Update process list
             if (data.processes && data.processes.length > 0) {
                 let html = '';
                 data.processes.forEach(p => {
@@ -421,7 +708,9 @@
                         </div>
                     `;
                 });
-                document.getElementById('processes-list').innerHTML = html;
+                document.getElementById('ram-proc-list').innerHTML = html;
+                document.getElementById('cpu-proc-list').innerHTML = html;
+                document.getElementById('ssd-proc-list').innerHTML = html;
             }
         };
     </script>
