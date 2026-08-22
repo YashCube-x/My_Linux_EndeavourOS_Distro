@@ -7,27 +7,26 @@ import gi
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.1')
-from gi.repository import Gtk, Gdk, WebKit2, GLib
+gi.require_version('GtkLayerShell', '0.1')
+from gi.repository import Gtk, Gdk, WebKit2, GLib, GtkLayerShell
 
 PID_FILE = "/tmp/istat_popup.pid"
 
-def is_running():
-    if os.path.exists(PID_FILE):
+# Toggle logic: if already open, close it
+if os.path.exists(PID_FILE):
+    try:
+        with open(PID_FILE, 'r') as f:
+            old_pid = int(f.read().strip())
+        os.kill(old_pid, 0)
+        # Process is alive, kill it to toggle OFF
+        os.kill(old_pid, 9)
+        os.remove(PID_FILE)
+        sys.exit(0)
+    except Exception:
         try:
-            with open(PID_FILE, 'r') as f:
-                old_pid = int(f.read().strip())
-            os.kill(old_pid, 9)
             os.remove(PID_FILE)
-            return True
         except Exception:
-            try:
-                os.remove(PID_FILE)
-            except Exception:
-                pass
-    return False
-
-if is_running():
-    sys.exit(0)
+            pass
 
 with open(PID_FILE, 'w') as f:
     f.write(str(os.getpid()))
@@ -66,12 +65,11 @@ def get_stats():
     swap_pct = int((swap_used / swap_total) * 100) if swap_total > 0 else 0
 
     # 3. CPU / Pressure parsing
-    load1, load5, load15 = 0.0, 0.0, 0.0
+    load1 = 0.0
     try:
         with open('/proc/loadavg', 'r') as f:
             parts = f.read().split()
             load1 = float(parts[0])
-            load5 = float(parts[1])
     except Exception:
         pass
     
@@ -86,7 +84,6 @@ def get_stats():
             universal_newlines=True
         )
         lines = output.strip().split('\n')[1:]
-        seen_names = set()
         for line in lines:
             parts = line.split()
             if len(parts) >= 3:
@@ -103,8 +100,8 @@ def get_stats():
                         "language_server": "Language Server",
                         "claude": "Claude Code",
                         "node": "Node.js Server",
-                        "wayvnc": "Tablet Screen Share",
-                        "Hyprland": "Hyprland Compositor",
+                        "wayvnc": "Tablet Share",
+                        "Hyprland": "Hyprland",
                         "waybar": "Waybar",
                         "kitty": "Terminal",
                         "btop": "Activity Monitor"
@@ -147,24 +144,28 @@ class IStatPopup(Gtk.Window):
     def __init__(self):
         super().__init__(type=Gtk.WindowType.TOPLEVEL)
         self.set_title("iStat Menus")
-        self.set_wmclass("istat_popup", "istat_popup")
-        self.set_default_size(320, 480)
-        self.set_resizable(False)
-        self.set_decorated(False)
-        self.set_position(Gtk.WindowPosition.NONE)
+        self.set_default_size(325, 485)
         self.set_app_paintable(True)
 
+        # Initialize GtkLayerShell for native Wayland layer surface
+        GtkLayerShell.init_for_window(self)
+        GtkLayerShell.set_layer(self, GtkLayerShell.Layer.OVERLAY)
+        GtkLayerShell.set_namespace(self, "istat-popup")
+        
+        # Anchor to Top-Right
+        GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.TOP, True)
+        GtkLayerShell.set_anchor(self, GtkLayerShell.Edge.RIGHT, True)
+        GtkLayerShell.set_margin(self, GtkLayerShell.Edge.TOP, 34)
+        GtkLayerShell.set_margin(self, GtkLayerShell.Edge.RIGHT, 12)
+        GtkLayerShell.set_keyboard_mode(self, GtkLayerShell.KeyboardMode.ON_DEMAND)
+
+        # Set transparent RGBA visual
         screen = self.get_screen()
         visual = screen.get_rgba_visual()
         if visual and screen.is_composited():
             self.set_visual(visual)
 
-        self.move(1580, 34)
-
-        self.connect("key-press-event", self.on_key_press)
-        self.connect("focus-out-event", self.on_focus_out)
-        self.connect("destroy", self.on_destroy)
-
+        # WebKit View
         self.webview = WebKit2.WebView()
         self.webview.set_background_color(Gdk.RGBA(0, 0, 0, 0))
 
@@ -175,11 +176,14 @@ class IStatPopup(Gtk.Window):
         html_path = os.path.expanduser("~/.config/waybar/scripts/istat.html")
         self.webview.load_uri(f"file://{html_path}")
 
+        self.connect("key-press-event", self.on_key_press)
+        self.connect("destroy", self.on_destroy)
+
         self.add(self.webview)
         self.show_all()
 
         GLib.timeout_add(1500, self.update_data)
-        GLib.timeout_add(300, self.update_data)
+        GLib.timeout_add(200, self.update_data)
 
     def on_js_action(self, content_manager, js_result):
         try:
@@ -209,10 +213,6 @@ class IStatPopup(Gtk.Window):
         if event.keyval == Gdk.KEY_Escape:
             self.destroy()
             return True
-        return False
-
-    def on_focus_out(self, widget, event):
-        self.destroy()
         return False
 
     def on_destroy(self, widget):

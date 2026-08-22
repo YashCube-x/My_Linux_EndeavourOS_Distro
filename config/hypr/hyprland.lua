@@ -483,3 +483,10 @@ hl.layer_rule({
     blur  = true,
 })
 
+hl.layer_rule({
+    -- Frosted glass blur effect for iStat popup widget
+    name  = "istat-popup-blur",
+    match = { namespace = "^(istat-popup)$" },
+    blur  = true,
+})
+
