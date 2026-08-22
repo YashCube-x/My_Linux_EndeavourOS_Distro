@@ -71,7 +71,7 @@ window#waybar {
     margin: 3px 0;
 }
 
-/* --- Right Section (macOS Control Center Style) --- */
+/* --- Right Section (macOS Clean Status Bar Style) --- */
 
 #custom-system_stats,
 #custom-tablet,
@@ -83,11 +83,12 @@ window#waybar {
 #custom-notification,
 #clock,
 #custom-power {
-    background-color: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.90);
-    border-radius: 6px;
+    background: transparent;
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.88);
     padding: 0 8px;
-    margin: 3px 2.5px;
+    margin: 3px 2px;
+    border-radius: 6px;
     transition: all 0.2s ease-in-out;
 }
 
@@ -101,18 +102,23 @@ window#waybar {
 #custom-notification:hover,
 #clock:hover,
 #custom-power:hover {
-    background-color: rgba(255, 255, 255, 0.18);
+    background: transparent;
+    background-color: transparent;
     color: #ffffff;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
 }
 
 /* Tablet Toggle Styling */
 #custom-tablet.connected {
     color: #a6e3a1;
-    background-color: rgba(166, 227, 161, 0.14);
+    background: transparent;
+    background-color: transparent;
 }
 
 #custom-tablet.disconnected {
     color: rgba(255, 255, 255, 0.35);
+    background: transparent;
+    background-color: transparent;
 }
 
 /* Hardware indicators subtle highlights */
