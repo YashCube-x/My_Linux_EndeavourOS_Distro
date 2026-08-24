@@ -90,19 +90,28 @@ class ClipboardWindow(Gtk.Window):
                 self.destroy()
             elif val.startswith("copy_item:"):
                 cid = val.split(":", 1)[1]
-                p1 = subprocess.Popen(["cliphist", "decode", cid], stdout=subprocess.PIPE)
-                subprocess.Popen(["wl-copy"], stdin=p1.stdout)
-                p1.stdout.close()
-                GLib.timeout_add(100, self.destroy)
+                try:
+                    content = subprocess.check_output(["cliphist", "decode", cid])
+                    # Copy to both standard Wayland clipboard and primary selection
+                    p = subprocess.Popen(["wl-copy"], stdin=subprocess.PIPE)
+                    p.communicate(input=content)
+                    p_pri = subprocess.Popen(["wl-copy", "--primary"], stdin=subprocess.PIPE)
+                    p_pri.communicate(input=content)
+                except Exception as e:
+                    pass
+                GLib.timeout_add(120, self.destroy)
             elif val.startswith("delete_item:"):
                 cid = val.split(":", 1)[1]
-                p1 = subprocess.Popen(["cliphist", "decode", cid], stdout=subprocess.PIPE)
-                subprocess.Popen(["cliphist", "delete"], stdin=p1.stdout)
-                p1.stdout.close()
-                GLib.timeout_add(200, self.update_data)
+                try:
+                    content = subprocess.check_output(["cliphist", "decode", cid])
+                    p = subprocess.Popen(["cliphist", "delete"], stdin=subprocess.PIPE)
+                    p.communicate(input=content)
+                except Exception:
+                    pass
+                GLib.timeout_add(150, self.update_data)
             elif val == "clear_all":
                 subprocess.Popen(["cliphist", "wipe"])
-                GLib.timeout_add(200, self.update_data)
+                GLib.timeout_add(150, self.update_data)
         except Exception:
             pass
 
