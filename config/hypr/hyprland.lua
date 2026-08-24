@@ -449,6 +449,19 @@ hl.window_rule({
 })
 
 hl.window_rule({
+    -- macOS Bluetooth Manager Popup
+    name  = "istat-popup-bluetooth",
+    match = { title = "^(iStat Menus - Bluetooth)$" },
+
+    float       = true,
+    pin         = true,
+    border_size = 0,
+    size        = { 320, 420 },
+    move        = { 1420, 34 },
+    animation   = "slide top",
+})
+
+hl.window_rule({
     -- macOS Sound & App Voice Manager Popup
     name  = "istat-popup-sound",
     match = { title = "^(iStat Menus - Sound)$" },
@@ -457,7 +470,7 @@ hl.window_rule({
     pin         = true,
     border_size = 0,
     size        = { 320, 480 },
-    move        = { 1420, 34 },
+    move        = { 1460, 34 },
     animation   = "slide top",
 })
 

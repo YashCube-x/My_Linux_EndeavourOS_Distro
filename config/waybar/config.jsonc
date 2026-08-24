@@ -78,7 +78,7 @@
         "exec": "~/.config/waybar/scripts/bluetooth_status.sh",
         "return-type": "json",
         "interval": 5,
-        "on-click": "~/.config/waybar/scripts/bluetooth_popup.sh",
+        "on-click": "/home/suyash/.config/waybar/scripts/bluetooth_popup.py",
         "on-click-right": "blueman-manager",
         "tooltip": true
     },
