@@ -268,9 +268,9 @@ hl.bind(mainMod .. " + bracketleft",  hl.dsp.group.prev())
 -- Pin a floating window on top, visible on every workspace
 hl.bind(mainMod .. " + SHIFT + P", hl.dsp.window.pin({ action = "toggle" }))
 
--- Browse and paste clipboard history
-hl.bind(mainMod .. " + V",       hl.dsp.exec_cmd("~/.config/waybar/scripts/clipboard_picker.sh"))
-hl.bind(mainMod .. " + ALT + V", hl.dsp.exec_cmd("~/.config/waybar/scripts/clipboard_picker.sh"))
+-- Browse and paste clipboard history (Modern macOS/Raycast UI)
+hl.bind(mainMod .. " + V",       hl.dsp.exec_cmd("/home/suyash/.config/waybar/scripts/clipboard_popup.py"))
+hl.bind(mainMod .. " + ALT + V", hl.dsp.exec_cmd("/home/suyash/.config/waybar/scripts/clipboard_popup.py"))
 
 
 
@@ -447,6 +447,18 @@ hl.window_rule({
 
     float  = true,
     center = true,
+})
+
+hl.window_rule({
+    -- macOS & Raycast Style Clipboard History Popup
+    name  = "istat-popup-clipboard",
+    match = { title = "^(iStat Menus - Clipboard)$" },
+
+    float       = true,
+    pin         = true,
+    border_size = 0,
+    size        = { 380, 520 },
+    animation   = "popin 85%",
 })
 
 hl.window_rule({

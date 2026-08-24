@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clipboard History</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        html, body {
+            background-color: transparent !important;
+            background: transparent !important;
+            color: #f1f5f9;
+            font-family: "SF Pro Display", "SF Pro Text", "SF Pro", -apple-system, sans-serif;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+
+        .card {
+            background: rgba(22, 27, 46, 0.96);
+            backdrop-filter: blur(35px);
+            -webkit-backdrop-filter: blur(35px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 14px 14px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            gap: 10px;
+        }
+
+        /* Header & Search Bar */
+        .header {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2px;
+        }
+
+        .title {
+            font-size: 13.5px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .count-badge {
+            font-size: 10px;
+            font-weight: 700;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.15);
+            padding: 2px 7px;
+            border-radius: 10px;
+        }
+
+        /* Search Input */
+        .search-box {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            padding: 8px 10px 8px 30px;
+            color: #ffffff;
+            font-size: 12px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+        }
+
+        /* Filter Tabs */
+        .tabs-row {
+            display: flex;
+            gap: 5px;
+            padding: 0 2px;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.7);
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 10.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+        }
+
+        .tab-btn.active {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: rgba(56, 189, 248, 0.5);
+            color: #38bdf8;
+        }
+
+        /* Clipboard Items List */
+        .items-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+            padding-right: 3px;
+        }
+
+        .items-list::-webkit-scrollbar { width: 4px; }
+        .items-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 2px; }
+
+        .clip-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 8px 10px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .clip-item:hover, .clip-item.selected {
+            background: rgba(56, 189, 248, 0.14);
+            border-color: rgba(56, 189, 248, 0.35);
+            transform: translateX(2px);
+        }
+
+        .clip-left {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            max-width: 82%;
+        }
+
+        .clip-type-icon {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            flex-shrink: 0;
+        }
+
+        .clip-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        .clip-text {
+            font-size: 11.5px;
+            font-weight: 500;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .clip-meta {
+            font-size: 9.5px;
+            color: rgba(255, 255, 255, 0.45);
+            font-weight: 500;
+            display: flex;
+            gap: 6px;
+        }
+
+        .clip-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .clip-item:hover .clip-right, .clip-item.selected .clip-right {
+            opacity: 1;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border-radius: 4px;
+            padding: 3px 6px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .action-btn:hover {
+            background: #38bdf8;
+            color: #0f172a;
+            border-color: #38bdf8;
+        }
+
+        .action-btn.btn-delete:hover {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+        }
+
+        /* Toast notification */
+        .toast {
+            display: none;
+            position: absolute;
+            bottom: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(16, 185, 129, 0.9);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+        }
+
+        /* Bottom Dock */
+        .bottom-dock {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .dock-left {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-clear {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+            border-radius: 5px;
+            padding: 3px 8px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-clear:hover {
+            background: #ef4444;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!-- Header & Search -->
+        <div class="header">
+            <div class="title-row">
+                <span class="title">📋 Clipboard History</span>
+                <span class="count-badge" id="item-count">0 items</span>
+            </div>
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-input" class="search-input" placeholder="Search clipboard history..." autofocus oninput="onSearch(this.value)" onkeydown="handleKey(event)">
+            </div>
+            <!-- Filter Tabs -->
+            <div class="tabs-row">
+                <button class="tab-btn active" onclick="setFilter('all', this)">All</button>
+                <button class="tab-btn" onclick="setFilter('text', this)">📝 Text</button>
+                <button class="tab-btn" onclick="setFilter('code', this)">💻 Code</button>
+                <button class="tab-btn" onclick="setFilter('link', this)">🔗 Links</button>
+                <button class="tab-btn" onclick="setFilter('image', this)">🖼️ Images</button>
+            </div>
+        </div>
+
+        <!-- Items List -->
+        <div class="items-list" id="items-list">
+            <div style="text-align:center; padding:20px; font-size:11px; color:rgba(255,255,255,0.4);">Loading clipboard history...</div>
+        </div>
+
+        <!-- Toast -->
+        <div id="toast" class="toast">Copied to Clipboard! ✓</div>
+
+        <!-- Bottom Dock -->
+        <div class="bottom-dock">
+            <div class="dock-left">
+                <button class="btn-clear" onclick="sendAction('clear_all')">🗑️ Clear All</button>
+            </div>
+            <div>[↑/↓] Select • [Enter] Paste • [Esc] Close</div>
+        </div>
+    </div>
+
+    <script>
+        let allItems = [];
+        let filteredItems = [];
+        let activeFilter = 'all';
+        let selectedIndex = 0;
+
+        function sendAction(action, payload) {
+            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.actionHandler) {
+                const msg = payload !== undefined ? `${action}:${payload}` : action;
+                window.webkit.messageHandlers.actionHandler.postMessage(msg);
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 1800);
+        }
+
+        function copyItem(id, rawText) {
+            showToast('Copied to Clipboard! ✓');
+            sendAction('copy_item', id);
+        }
+
+        function deleteItem(id, event) {
+            if (event) event.stopPropagation();
+            sendAction('delete_item', id);
+        }
+
+        function setFilter(filter, el) {
+            activeFilter = filter;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            renderList();
+        }
+
+        function onSearch(query) {
+            renderList(query);
+        }
+
+        function classifyContent(text) {
+            if (text.startsWith('[[ binary data')) return 'image';
+            if (text.startsWith('http://') || text.startsWith('https://') || text.startsWith('www.')) return 'link';
+            if (text.includes('function') || text.includes('def ') || text.includes('const ') || text.includes('import ') || text.includes('<html>') || text.includes('class ') || text.includes('{') && text.includes('}')) return 'code';
+            return 'text';
+        }
+
+        function renderList(searchQuery = '') {
+            const container = document.getElementById('items-list');
+            const query = (searchQuery || document.getElementById('search-input').value).toLowerCase();
+
+            filteredItems = allItems.filter(item => {
+                const type = classifyContent(item.content);
+                const matchesFilter = (activeFilter === 'all') || (activeFilter === type);
+                const matchesSearch = !query || item.content.toLowerCase().includes(query);
+                return matchesFilter && matchesSearch;
+            });
+
+            document.getElementById('item-count').innerText = `${filteredItems.length} items`;
+
+            if (filteredItems.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:30px; font-size:11.5px; color:rgba(255,255,255,0.4);">No clipboard items found</div>';
+                return;
+            }
+
+            let html = '';
+            filteredItems.forEach((item, index) => {
+                const type = classifyContent(item.content);
+                let icon = '📝';
+                let typeName = 'Text';
+
+                if (type === 'image') { icon = '🖼️'; typeName = 'Image'; }
+                else if (type === 'link') { icon = '🔗'; typeName = 'Link'; }
+                else if (type === 'code') { icon = '💻'; typeName = 'Code'; }
+
+                const isSelected = index === selectedIndex;
+                const preview = item.content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+                html += `
+                    <div class="clip-item ${isSelected ? 'selected' : ''}" onclick="copyItem('${item.id}', '${encodeURIComponent(item.content)}')">
+                        <div class="clip-left">
+                            <div class="clip-type-icon">${icon}</div>
+                            <div class="clip-details">
+                                <span class="clip-text">${preview}</span>
+                                <div class="clip-meta">
+                                    <span>${typeName}</span>
+                                    <span>•</span>
+                                    <span>#${item.id}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clip-right">
+                            <button class="action-btn" onclick="copyItem('${item.id}'); event.stopPropagation();">Copy</button>
+                            <button class="action-btn btn-delete" onclick="deleteItem('${item.id}', event);">✕</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function handleKey(event) {
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                selectedIndex = Math.min(filteredItems.length - 1, selectedIndex + 1);
+                renderList();
+                scrollSelectedIntoView();
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                selectedIndex = Math.max(0, selectedIndex - 1);
+                renderList();
+                scrollSelectedIntoView();
+            } else if (event.key === 'Enter') {
+                event.preventDefault();
+                if (filteredItems[selectedIndex]) {
+                    copyItem(filteredItems[selectedIndex].id);
+                }
+            } else if (event.key === 'Escape') {
+                sendAction('close');
+            }
+        }
+
+        function scrollSelectedIntoView() {
+            const selectedEl = document.querySelector('.clip-item.selected');
+            if (selectedEl) selectedEl.scrollIntoView({ block: 'nearest' });
+        }
+
+        window.updateStats = function(data) {
+            if (!data || !data.items) return;
+            allItems = data.items;
+            renderList();
+        };
+    </script>
+</body>
+</html>
