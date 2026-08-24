@@ -269,6 +269,7 @@ hl.bind(mainMod .. " + bracketleft",  hl.dsp.group.prev())
 hl.bind(mainMod .. " + SHIFT + P", hl.dsp.window.pin({ action = "toggle" }))
 
 -- Browse and paste clipboard history
+hl.bind(mainMod .. " + V",       hl.dsp.exec_cmd("~/.config/waybar/scripts/clipboard_picker.sh"))
 hl.bind(mainMod .. " + ALT + V", hl.dsp.exec_cmd("~/.config/waybar/scripts/clipboard_picker.sh"))
 
 
