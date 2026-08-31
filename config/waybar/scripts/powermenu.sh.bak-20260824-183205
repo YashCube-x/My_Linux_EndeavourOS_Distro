@@ -14,7 +14,7 @@ case "$chosen" in
         systemctl suspend
         ;;
     "🚪 Logout")
-        pkill -SIGTERM Hyprland
+        hyprctl dispatch exit
         ;;
     "🔄 Reboot")
         systemctl reboot
