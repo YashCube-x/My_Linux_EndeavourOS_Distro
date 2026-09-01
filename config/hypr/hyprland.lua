@@ -324,10 +324,11 @@ hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("~/.config/hypr/scripts/toggle_waybar
 -- Power menu (quickshell's native menu, or wofi fallback in battery mode)
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("~/.config/hypr/scripts/smart_powermenu.sh"))
 
--- Screenshots (Copy to Clipboard Only by Default)
-hl.bind("Print",                hl.dsp.exec_cmd("~/.local/bin/copy-screenshot.sh"))
-hl.bind(mainMod .. " + Print",   hl.dsp.exec_cmd("~/.local/bin/copy-screenshot.sh"))
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("~/.local/bin/copy-screenshot.sh"))
+-- Screenshots (Copy to Clipboard Only by Default, Annotate, or Instant Save)
+hl.bind("Print",                  hl.dsp.exec_cmd("~/.local/bin/copy-screenshot.sh copy"))
+hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("~/.local/bin/copy-screenshot.sh copy"))
+hl.bind(mainMod .. " + Print",     hl.dsp.exec_cmd("~/.local/bin/copy-screenshot.sh edit"))
+hl.bind("CTRL + Print",            hl.dsp.exec_cmd("~/.local/bin/copy-screenshot.sh save"))
 
 
 

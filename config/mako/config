@@ -14,6 +14,7 @@ layer=overlay
 anchor=top-right
 width=340
 height=120
+actions=1
 
 [urgency=low]
 border-color=#343a4d
